@@ -12,8 +12,8 @@
 #include <stdlib.h>
 
 
-#include "main_html.h"
-#include "captive_html.h"
+#include "inc/main_html.h"
+#include "inc/captive_html.h"
 
 
 // WebApp Libraries

@@ -23,12 +23,12 @@ def main():
         captive_html = f.read()
 
     # Write the html files to the .h files
-    with open(os.path.join(servita_path, 'main_html.h'), 'w') as f:
+    with open(os.path.join(servita_path, 'inc/main_html.h'), 'w') as f:
         f.write('const char main_html[] PROGMEM = R"rawliteral(\n')
         f.write(main_html)
         f.write('\n)rawliteral\";')
     
-    with open(os.path.join(servita_path, 'captive_html.h'), 'w') as f:
+    with open(os.path.join(servita_path, 'inc/captive_html.h'), 'w') as f:
         f.write('const char captive_html[] PROGMEM = R"rawliteral(\n')
         f.write(captive_html)
         f.write('\n)rawliteral\";')
