@@ -11,12 +11,15 @@ ServitaFirmware_InternalTeamOnly/
 ├── export_html.py
 ├── html/
 │   ├── captive.html
-│   ├── main.html
+│   └── main.html
 ├── README.md
 └── Servita/
-    ├── captive_html.h
-    ├── main_html.h
-    └── Servita.ino
+    ├── inc/
+    │   ├── captive_html.h
+    │   ├── main_html.h
+    │   └── motor.h
+    ├── Servita.ino
+    ├── motor.cpp
 ```
 
 ### `html` Directory
@@ -28,8 +31,11 @@ Contains the HTML files for the main and captive portals:
 ### `Servita` Directory
 
 Contains the main firmware code and the exported HTML header files:
-- `captive_html.h`: The header file containing the HTML content for the captive portal.
-- `main_html.h`: The header file containing the HTML content for the main application interface.
+- `inc/`: Directory for header files.
+  - `captive_html.h`: The header file containing the HTML content for the captive portal.
+  - `main_html.h`: The header file containing the HTML content for the main application interface.
+  - `motor.h`: The header file for motor-related functions and definitions.
+- `motor.cpp`: The source file for motor-related functions.
 - `Servita.ino`: The main Arduino sketch file.
 
 ### `export_html.py`
@@ -44,7 +50,7 @@ To update the header files with the latest HTML content, simply run the followin
 python3 export_html.py
 ```
 
-This will generate the `captive_html.h` and `main_html.h` files in the `Servita` directory.
+This will generate the `captive_html.h` and `main_html.h` files in the `Servita/inc` directory.
 
 ## Advantages of Exporting HTML Files
 
@@ -64,9 +70,70 @@ To further improve the maintainability and readability of the project, future up
 
 These files can then be referenced in the HTML, allowing for easier updates and testing of the styles and scripts independently of the HTML content.
 
-## Compilation and Upload
+## Installation and Setup
 
-### Compiling with Arduino CLI
+### Install Arduino CLI
+
+#### Linux
+
+1. Download and install the Arduino CLI:
+    ```sh
+    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+    sudo mv bin/arduino-cli /usr/local/bin/
+    ```
+
+2. Configure the Arduino CLI:
+    ```sh
+    arduino-cli config init
+    ```
+
+3. Add the ESP32 board support:
+    ```sh
+    arduino-cli core update-index
+    arduino-cli core install esp32:esp32
+    ```
+
+#### Windows
+
+1. Download the Arduino CLI executable from the [Arduino CLI GitHub releases page](https://github.com/arduino/arduino-cli/releases).
+
+2. Extract the executable and add it to your system PATH.
+
+3. Configure the Arduino CLI:
+    ```sh
+    arduino-cli config init
+    ```
+
+4. Add the ESP32 board support:
+    ```sh
+    arduino-cli core update-index
+    arduino-cli core install esp32:esp32
+    ```
+
+### Install Required Libraries
+
+1. Install the required libraries using the Arduino CLI:
+    ```sh
+    arduino-cli lib install "FastLED"
+    arduino-cli lib install "WiFi"
+    arduino-cli lib install "AsyncTCP"
+    arduino-cli lib install "ESP Async WebServer"
+    arduino-cli lib install "FS"
+    arduino-cli lib install "DNSServer"
+    arduino-cli lib install "Preferences"
+    ```
+
+2. Manually install the SerialCommand library:
+    ```sh
+    git clone https://github.com/kroimon/Arduino-SerialCommand.git
+    mv Arduino-SerialCommand %YOUR_ARDUINO_LIB_PATH%/SerialCommand
+    ```
+    Replace `%YOUR_ARDUINO_LIB_PATH%` with the path to your Arduino libraries directory. This can be
+    found in the Arduino IDE under `File > Preferences > Sketchbook location`.
+
+### Compilation and Upload
+
+#### Compiling with Arduino CLI
 
 To compile the firmware using the Arduino CLI, use the following command:
 
@@ -74,7 +141,7 @@ To compile the firmware using the Arduino CLI, use the following command:
 arduino-cli compile --fqbn esp32:esp32:esp32 Servita
 ```
 
-### Uploading to ESP32
+#### Uploading to ESP32
 
 To upload the compiled firmware to the ESP32, use the following command, replacing `/dev/ttyUSB0` with the appropriate serial port for your ESP32 device:
 
