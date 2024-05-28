@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "inc/motor.h"
+
 
 #include "inc/main_html.h"
 #include "inc/captive_html.h"
@@ -41,18 +43,6 @@ const char *ssid = "Servita";
 #define LED_PIN 4    // External RGB LED Data Pin
 #define NUM_LEDS 48  // Number of LEDs on External LED Array
 
-#define motor1In1 17  // Motor Driver Control Pins
-#define motor1In2 5   //
-#define motor1En1 16  // \
-                      //
-#define motor2In3 19  //
-#define motor2In4 21  //
-#define motor2En2 18  // \
-                      //
-#define motor3In5 15  //
-#define motor3In6 13  //
-#define motor3En3 12  // \
-                      //
 #define duoButton 27  //
 #define ExtIO2 26     //
 #define ExtIO3 25     //
@@ -65,10 +55,6 @@ bool drinkPouringStarted = false;
 bool drinkPouringComplete = false;
 bool carraigeUpStarted = false;
 bool carraigeReachedTop = false;
-bool elevatorMovingDown = false;
-bool elevatorMovingUp = false;
-bool pump1running = false;
-bool pump2running = false;
 unsigned long pour_start_time;
 unsigned long current_time;
 int pourSize[] = { 3000, 3000, 1500, 1500 };
@@ -99,14 +85,10 @@ void drink2();
 void drink3();
 void cancelDispense();
 void abortDispense();
+void dispenseDrink();
 void motor2down();
 void motor2up();
 void motor2stop();
-void pump1start();
-void pump1stop();
-void pump2start();
-void pump2stop();
-void dispenseDrink();
 void resetDispenseFlags();
 void setPourSize(int pourOption, int time);
 void printPourSizes();
@@ -234,27 +216,27 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
       }
     } else if (parts.size() == 3 && strcmp(parts[0], "manual") == 0) {
       if (strcmp(parts[1], "mCarUp") == 0) {
-        motor2up();
+        set_motor_state(&gantry, MOTOR_UP);
       } else if (strcmp(parts[1], "mCarDown") == 0) {
-        motor2down();
+        set_motor_state(&gantry, MOTOR_DOWN);
       } else if (strcmp(parts[1], "stop") == 0) {
-        motor2stop();
+        set_motor_state(&gantry, MOTOR_OFF);
       } else if (strcmp(parts[1], "mCarHome") == 0) {
-        motor2up();
+        set_motor_state(&gantry, MOTOR_UP);
       }
     } else if (parts.size() == 4 && strcmp(parts[1], "start") == 0) {
 
       if (strcmp(parts[2], "rPump1") == 0) {
-        pump1start();
+        set_motor_state(&pump1, MOTOR_ON);
       } else if (strcmp(parts[2], "rPump2")) {
-        pump2start();
+        set_motor_state(&pump2, MOTOR_ON);
       }
 
     } else if (parts.size() == 4 && strcmp(parts[1], "stop") == 0) {
       if (strcmp(parts[2], "rPump1") == 0) {
-        pump1stop();
+        set_motor_state(&pump1, MOTOR_OFF);
       } else if (strcmp(parts[2], "rPump2") == 0) {
-        pump2stop();
+        set_motor_state(&pump2, MOTOR_OFF);
       }
     } else if (parts.size() == 3 && strcmp(parts[0], "net") == 0) {
 
@@ -367,27 +349,10 @@ void setup() {
   sCmd.addCommand("x", abortDispense);
   sCmd.setDefaultHandler(unrecognized);
 
-  // Set all motor control pins to output
-  pinMode(motor1In1, OUTPUT);
-  pinMode(motor1In2, OUTPUT);
-  pinMode(motor1En1, OUTPUT);
-  pinMode(motor2In3, OUTPUT);
-  pinMode(motor2In4, OUTPUT);
-  pinMode(motor2En2, OUTPUT);
-  pinMode(motor3In5, OUTPUT);
-  pinMode(motor3In6, OUTPUT);
-  pinMode(motor3En3, OUTPUT);
-
-  // Set initial off states for motor outputs
-  digitalWrite(motor1In1, LOW);
-  digitalWrite(motor1In2, LOW);
-  digitalWrite(motor1En1, LOW);
-  digitalWrite(motor2In3, LOW);
-  digitalWrite(motor2In4, LOW);
-  digitalWrite(motor2En2, LOW);
-  digitalWrite(motor3In5, LOW);
-  digitalWrite(motor3In6, LOW);
-  digitalWrite(motor3En3, LOW);
+  // Initialize motor pins and states
+  init_motor(&pump1);
+  init_motor(&pump2);
+  init_motor(&gantry);
 
   // Set hardware input pin configurations
   pinMode(limitSwitchLow, INPUT);
@@ -400,7 +365,7 @@ void setup() {
   attachInterrupt(limitSwitchLow, endStopLow, FALLING);
 
   // Send elevator to the top if not already there
-  if (digitalRead(limitSwitchHigh) == 1) motor2up();
+  if (digitalRead(limitSwitchHigh) == 1)  set_motor_state(&gantry, MOTOR_UP);
   // WebApp - Start WebSocket
   initWebSocket();
   // Print ESP Local IP Address
@@ -418,13 +383,13 @@ void loop() {
 
 
   // Response to limit switch hardware interrupt
-  if (endStopHighTrigger && elevatorMovingUp) {
-    motor2stop();
+  if (endStopHighTrigger && gantry.state == MOTOR_UP) {
+    set_motor_state(&gantry, MOTOR_OFF);
     endStopHighTrigger = false;
     Serial.println("endStopHigh");
   }
-  if (endStopLowTrigger && elevatorMovingDown) {
-    motor2stop();
+  if (endStopLowTrigger && gantry.state == MOTOR_DOWN) {
+    set_motor_state(&gantry, MOTOR_OFF);
     endStopLowTrigger = false;
     Serial.println("endStopLow");
   }
@@ -481,17 +446,17 @@ void drink3() {
 // Soft termination of dispense function. Will stop pumps and return elevator to the top position.
 void cancelDispense() {
   resetDispenseFlags();
-  pump1stop();
-  pump2stop();
-  motor2up();
+  set_motor_state(&pump1, MOTOR_OFF);
+  set_motor_state(&pump2, MOTOR_OFF);
+  set_motor_state(&gantry, MOTOR_UP);
 }
 
 // Hard termination of dispense function. Will stop pumps and motors in place.
 void abortDispense() {
   resetDispenseFlags();
-  pump1stop();
-  pump2stop();
-  motor2stop();
+  set_motor_state(&pump1, MOTOR_OFF);
+  set_motor_state(&pump2, MOTOR_OFF);
+  set_motor_state(&gantry, MOTOR_OFF);
 }
 
 // Reads hardware input pins.
@@ -523,14 +488,14 @@ void pourDrink() {
   if (drinkPouringStarted == false) {
     switch (drinkVariant) {
       case 1:
-        pump1start();
+        set_motor_state(&pump1, MOTOR_ON);
         break;
       case 2:
-        pump2start();
+        set_motor_state(&pump2, MOTOR_ON);
         break;
       case 3:
-        pump1start();
-        pump2start();
+        set_motor_state(&pump1, MOTOR_ON);
+        set_motor_state(&pump2, MOTOR_ON);
         break;
     }
     drinkPouringStarted = true;
@@ -539,19 +504,19 @@ void pourDrink() {
     unsigned long current_time = millis();
     switch (drinkVariant) {
       case 1:
-        if (current_time - pour_start_time > pourSize[0]) pump1stop();
+        if (current_time - pour_start_time > pourSize[0])   set_motor_state(&pump1, MOTOR_OFF);
+
         break;
       case 2:
-        if (current_time - pour_start_time > pourSize[1]) pump2stop();
+        if (current_time - pour_start_time > pourSize[1])   set_motor_state(&pump2, MOTOR_OFF);
         break;
       case 3:
-        if (current_time - pour_start_time > pourSize[2]) pump1stop();
-        if (current_time - pour_start_time > pourSize[3]) pump2stop();
+        if (current_time - pour_start_time > pourSize[2])   set_motor_state(&pump1, MOTOR_OFF);
+        if (current_time - pour_start_time > pourSize[3])   set_motor_state(&pump2, MOTOR_OFF);
         break;
     }
-    if (pump1running == false && pump2running == false) {
-      drinkPouringComplete = true;
-    }
+
+    drinkPouringComplete = (pump1.type == MOTOR_OFF && pump2.type == MOTOR_OFF);
   }
 }
 
@@ -570,7 +535,7 @@ void resetDispenseFlags() {
 void dispenseDrink() {
   dispenseInProgress = true;
   if (carraigeDownStarted == false) {
-    motor2down();
+    set_motor_state(&gantry, MOTOR_DOWN);
     Serial.println("carraige lowering");
     carraigeDownStarted = true;
   }
@@ -582,7 +547,7 @@ void dispenseDrink() {
     pourDrink();
   }
   if (drinkPouringComplete == true && carraigeUpStarted == false) {
-    motor2up();
+    set_motor_state(&gantry, MOTOR_UP);
     carraigeUpStarted = true;
     Serial.println("carraige raising");
   }
@@ -595,68 +560,6 @@ void dispenseDrink() {
   }
 }
 
-// Sets elevator motor in downward motion
-void motor2down() {
-  digitalWrite(motor2In3, HIGH);
-  digitalWrite(motor2In4, LOW);
-  digitalWrite(motor2En2, HIGH);
-  elevatorMovingDown = true;
-  elevatorMovingUp = false;
-  Serial.println("down");
-}
-
-// Sets elevator motor in upward motion
-void motor2up() {
-  digitalWrite(motor2In3, LOW);
-  digitalWrite(motor2In4, HIGH);
-  digitalWrite(motor2En2, HIGH);
-  elevatorMovingDown = false;
-  elevatorMovingUp = true;
-  Serial.println("up");
-}
-
-// Stops elevator motor
-void motor2stop() {
-  digitalWrite(motor2In3, LOW);
-  digitalWrite(motor2In4, LOW);
-  digitalWrite(motor2En2, HIGH);
-  elevatorMovingDown = false;
-  elevatorMovingUp = false;
-  Serial.println("stop");
-}
-
-// Starts Pump 1
-void pump1start() {
-  digitalWrite(motor1In1, HIGH);
-  digitalWrite(motor1In2, LOW);
-  digitalWrite(motor1En1, HIGH);
-  pump1running = true;
-  Serial.println("pump 1 start");
-}
-
-// Stops Pump 1
-void pump1stop() {
-  digitalWrite(motor1In1, LOW);
-  digitalWrite(motor1In2, LOW);
-  digitalWrite(motor1En1, HIGH);
-  pump1running = false;
-  Serial.println("pump 1 stop");
-}
-
-// Starts Pump 2
-void pump2start() {
-  digitalWrite(motor3In5, HIGH);
-  digitalWrite(motor3In6, LOW);
-  digitalWrite(motor3En3, HIGH);
-  pump2running = true;
-  Serial.println("pump 2 start");
-}
-
-// Stops Pump 2
-void pump2stop() {
-  digitalWrite(motor3In5, LOW);
-  digitalWrite(motor3In6, LOW);
-  digitalWrite(motor3En3, HIGH);
-  pump2running = false;
-  Serial.println("pump 2 stop");
-}
+void motor2down() {   set_motor_state(&gantry, MOTOR_DOWN); }
+void motor2up() {     set_motor_state(&gantry, MOTOR_UP);   }
+void motor2stop() {   set_motor_state(&gantry, MOTOR_OFF);  }
