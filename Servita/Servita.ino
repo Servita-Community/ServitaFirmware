@@ -139,8 +139,10 @@ void startCaptivePortal() {
     if (request->hasParam("ssid", true) && request->hasParam("password", true)) {
       String ssid = request->getParam("ssid", true)->value();
       String pass = request->getParam("password", true)->value();
+      preferences.begin("wifi", false);
       preferences.putString("ssid", ssid);
       preferences.putString("pass", pass);
+      preferences.end();
       request->send(200, "text/plain", "Received SSID: " + ssid + "\nPassword: " + pass);
       delay(3000);
       ESP.restart();  // Restart ESP to connect with new credentials
@@ -240,8 +242,10 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
       }
     } else if (parts.size() == 3 && strcmp(parts[0], "net") == 0) {
 
+      preferences.begin("wifi", false);
       preferences.putString("ssid", parts[1]);
       preferences.putString("pass", parts[2]);
+      preferences.end();
 
       ESP.restart();
     } else if (parts.size() == 3 && strcmp(parts[0], "lock") == 0) {
@@ -325,6 +329,7 @@ void setup() {
   preferences.begin("wifi", false);
   String ssid = preferences.getString("ssid", "");
   String pass = preferences.getString("pass", "");
+  preferences.end();
 
 
   if (ssid == "" || pass == "") {
