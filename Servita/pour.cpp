@@ -27,6 +27,7 @@ void init_pour_system() {
 
     drink_pour.drink = DRINK1;
     drink_pour.state = IDLE;
+    drink_pour.pour_start_time = 0;
 }
 
 void set_pour_size(pour_size_setting_t setting, uint8_t pour_size) {
@@ -62,4 +63,68 @@ void start_pour(drink_t drink) {
     set_motor_state(&gantry, MOTOR_DOWN);
     drink_pour.state = GANTRY_DECENDING;
     Serial.printf("Starting pour for drink: %d\n", drink);
+}
+
+void pour_seq_loop() {
+    switch (drink_pour.state) {
+        case GANTRY_DECENDING:
+            // TODO: Check current limit switch state for low triggered.
+            if (true) {
+                drink_pour.pour_start_time = (uint64_t) millis();
+                if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
+                if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
+                drink_pour.state = POURING;
+            }
+            break;
+        case POURING:
+            uint64_t pour_time = (uint64_t) millis() - drink_pour.pour_start_time;
+            switch (drink_pour.drink) {
+                case DRINK1:
+                    if (pour_time >= drink1_pour_size) {
+                        set_motor_state(&pump1, MOTOR_OFF);
+                        set_motor_state(&gantry, MOTOR_UP);
+                        drink_pour.state = GANTRY_ASCENDING;
+                    }
+                    break;
+                case DRINK2:
+                    if (pour_time >= drink2_pour_size) {
+                        set_motor_state(&pump2, MOTOR_OFF);
+                        set_motor_state(&gantry, MOTOR_UP);
+                        drink_pour.state = GANTRY_ASCENDING;
+                    }
+                    break;
+                case MIXED:
+                    bool pump1_done = pour_time >= mixed1_pour_size;
+                    bool pump2_done = pour_time >= mixed2_pour_size;
+
+                    if (pump1_done)     set_motor_state(&pump1, MOTOR_OFF);
+                    if (pump2_done)     set_motor_state(&pump2, MOTOR_OFF);
+
+                    if (pump1_done && pump2_done) {
+                        set_motor_state(&gantry, MOTOR_UP);
+                        drink_pour.state = GANTRY_ASCENDING;
+                    }
+                    break;
+            }
+            break;
+        case GANTRY_ASCENDING:
+            // TODO: Check current limit switch state for high triggered.
+            if (true)   drink_pour.state = IDLE;
+            break;
+        case IDLE:
+            break;
+    }
+}
+
+void abort_pour() {
+    if (drink_pour.state == IDLE) {
+        Serial.println("No pour to abort.");
+        return;
+    }
+
+    set_motor_state(&pump1, MOTOR_OFF);
+    set_motor_state(&pump2, MOTOR_OFF);
+    set_motor_state(&gantry, MOTOR_UP);
+    drink_pour.state = IDLE;
+    Serial.println("Pour aborted.");
 }

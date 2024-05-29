@@ -32,6 +32,7 @@ enum pour_size_setting_t {
 typedef struct {
     drink_t drink;
     pour_states_t state;
+    uint64_t pour_start_time;
 } drink_pour_t;
 
 
@@ -66,5 +67,10 @@ void start_pour(drink_t drink);
  * @brief Pour drink sequence driver. Place in main while loop
 */
 void pour_seq_loop();
+
+/**
+ * @brief Abort the pour sequence.
+*/
+void abort_pour();
 
 #endif // POUR_H

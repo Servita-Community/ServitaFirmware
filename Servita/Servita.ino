@@ -12,8 +12,7 @@
 #include <stdlib.h>
 
 #include "inc/motor.h"
-
-
+#include "inc/pour.h"
 #include "inc/main_html.h"
 #include "inc/captive_html.h"
 
@@ -58,7 +57,6 @@ bool carraigeReachedTop = false;
 unsigned long pour_start_time;
 unsigned long current_time;
 int pourSize[] = { 3000, 3000, 1500, 1500 };
-int drinkVariant;
 bool deviceLockout = false;
 
 // Flags used by limit switch interrupt
@@ -83,13 +81,9 @@ CRGB leds[NUM_LEDS];
 void drink1();
 void drink2();
 void drink3();
-void cancelDispense();
-void abortDispense();
-void dispenseDrink();
 void motor2down();
 void motor2up();
 void motor2stop();
-void resetDispenseFlags();
 void setPourSize(int pourOption, int time);
 void printPourSizes();
 void serial_setPourSize();
@@ -193,8 +187,8 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     if (parts.size() == 5 && strcmp(parts[0], "pour") == 0) {
       if (strcmp(parts[0], "pour") == 0) {
         // Handle pour-related actions
-        int size1Val = atoi(parts[1]);
-        int size2Val = atoi(parts[2]);
+        int size1Val = atoi(parts[2]);
+        int size2Val = atoi(parts[3]);
 
         int s1Mult = size1Val * 1000;
         int s2Mult = size2Val * 1000;
@@ -213,7 +207,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
           drink3();
         } else if (strcmp(parts[1], "pourCancel") == 0) {
           Serial.println("User Cancel");
-          cancelDispense();
+          abort_pour();
         }
       }
     } else if (parts.size() == 3 && strcmp(parts[0], "manual") == 0) {
@@ -350,14 +344,17 @@ void setup() {
   sCmd.addCommand("up", motor2up);
   sCmd.addCommand("s", motor2stop);
   sCmd.addCommand("read", printButtons);
-  sCmd.addCommand("cancel", cancelDispense);
-  sCmd.addCommand("x", abortDispense);
+  sCmd.addCommand("cancel", abort_pour);
+  sCmd.addCommand("x", abort_pour);
   sCmd.setDefaultHandler(unrecognized);
 
   // Initialize motor pins and states
   init_motor(&pump1);
   init_motor(&pump2);
   init_motor(&gantry);
+
+  // Initialize pour system
+  init_pour_system();
 
   // Set hardware input pin configurations
   pinMode(limitSwitchLow, INPUT);
@@ -399,7 +396,7 @@ void loop() {
     Serial.println("endStopLow");
   }
 
-  if (dispenseInProgress) dispenseDrink();  // Dispense routine gets called repeatedly when dispenseInProgress flag is high
+  pour_seq_loop();
 
   readButtons();  // Read inputs on every loop
 
@@ -427,41 +424,22 @@ void setPourSize(int pourOption, int time) {
 // Function to initiate dispense of drink 1. Requires lockout state to be 0 to operate.
 void drink1() {
   if (!deviceLockout) {
-    drinkVariant = 1;
-    dispenseDrink();
+    start_pour(DRINK1);
   } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
 }
 
 // Function to initiate dispense of drink 2. Requires lockout state to be 0 to operate.
 void drink2() {
   if (!deviceLockout) {
-    drinkVariant = 2;
-    dispenseDrink();
+    start_pour(DRINK2);
   } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
 }
 
 // Function to initiate dispense of drink 3 (mix from both pumps). Requires lockout state to be 0 to operate.
 void drink3() {
   if (!deviceLockout) {
-    drinkVariant = 3;
-    dispenseDrink();
+    start_pour(MIXED);
   } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
-}
-
-// Soft termination of dispense function. Will stop pumps and return elevator to the top position.
-void cancelDispense() {
-  resetDispenseFlags();
-  set_motor_state(&pump1, MOTOR_OFF);
-  set_motor_state(&pump2, MOTOR_OFF);
-  set_motor_state(&gantry, MOTOR_UP);
-}
-
-// Hard termination of dispense function. Will stop pumps and motors in place.
-void abortDispense() {
-  resetDispenseFlags();
-  set_motor_state(&pump1, MOTOR_OFF);
-  set_motor_state(&pump2, MOTOR_OFF);
-  set_motor_state(&gantry, MOTOR_OFF);
 }
 
 // Reads hardware input pins.
@@ -486,83 +464,6 @@ void printPourSizes() {
   Serial.println("pour size 1 = " + String(pourSize[1]));
   Serial.println("pour size 2 = " + String(pourSize[2]));
   Serial.println("pour size 3 = " + String(pourSize[3]));
-}
-
-// Non/blocking function responsible for initiating, timing, and stopping drink pour.
-void pourDrink() {
-  if (drinkPouringStarted == false) {
-    switch (drinkVariant) {
-      case 1:
-        set_motor_state(&pump1, MOTOR_ON);
-        break;
-      case 2:
-        set_motor_state(&pump2, MOTOR_ON);
-        break;
-      case 3:
-        set_motor_state(&pump1, MOTOR_ON);
-        set_motor_state(&pump2, MOTOR_ON);
-        break;
-    }
-    drinkPouringStarted = true;
-    pour_start_time = millis();
-  } else if (drinkPouringStarted == true && drinkPouringComplete == false) {
-    unsigned long current_time = millis();
-    switch (drinkVariant) {
-      case 1:
-        if (current_time - pour_start_time > pourSize[0])   set_motor_state(&pump1, MOTOR_OFF);
-
-        break;
-      case 2:
-        if (current_time - pour_start_time > pourSize[1])   set_motor_state(&pump2, MOTOR_OFF);
-        break;
-      case 3:
-        if (current_time - pour_start_time > pourSize[2])   set_motor_state(&pump1, MOTOR_OFF);
-        if (current_time - pour_start_time > pourSize[3])   set_motor_state(&pump2, MOTOR_OFF);
-        break;
-    }
-
-    drinkPouringComplete = (pump1.type == MOTOR_OFF && pump2.type == MOTOR_OFF);
-  }
-}
-
-// Resets flags used in the dispense function. Called at the end of dispense function, and by cancel & abort funcitons.
-void resetDispenseFlags() {
-  dispenseInProgress = false;
-  carraigeDownStarted = false;
-  carraigeReachedBottom = false;
-  drinkPouringStarted = false;
-  drinkPouringComplete = false;
-  carraigeUpStarted = false;
-  carraigeReachedTop = false;
-}
-
-// Non/blocking function responsible for choreographing elevator and pumps for main dispensing feature
-void dispenseDrink() {
-  dispenseInProgress = true;
-  if (carraigeDownStarted == false) {
-    set_motor_state(&gantry, MOTOR_DOWN);
-    Serial.println("carraige lowering");
-    carraigeDownStarted = true;
-  }
-  if (carraigeDownStarted == true && limitSwitchLowState == 0 && carraigeReachedBottom == false) {
-    carraigeReachedBottom = true;
-    Serial.println("carraige reached bottom");
-  }
-  if (carraigeReachedBottom == true && drinkPouringComplete == false) {
-    pourDrink();
-  }
-  if (drinkPouringComplete == true && carraigeUpStarted == false) {
-    set_motor_state(&gantry, MOTOR_UP);
-    carraigeUpStarted = true;
-    Serial.println("carraige raising");
-  }
-  if (carraigeUpStarted == true && limitSwitchHighState == 0 && carraigeReachedTop == false) {
-    carraigeReachedTop = true;
-    Serial.println("carraige reached top");
-  }
-  if (carraigeReachedTop == true) {
-    resetDispenseFlags();
-  }
 }
 
 void motor2down() {   set_motor_state(&gantry, MOTOR_DOWN); }

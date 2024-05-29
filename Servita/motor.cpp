@@ -51,10 +51,5 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
             break;
     }
     motor->state = state;
-    Serial.printf(
-        "Motor state set to: %s for motor type: %s\n",
-        MOTOR_STATE_TO_STRING(state),
-        MOTOR_TYPE_TO_STRING(motor->type)
-    );
     return true;
 }
