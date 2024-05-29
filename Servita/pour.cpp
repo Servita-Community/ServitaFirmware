@@ -9,10 +9,10 @@
 #include "inc/motor.h"
 #include <Preferences.h>
 
-uint8_t drink1_pour_size;
-uint8_t drink2_pour_size;
-uint8_t mixed1_pour_size;
-uint8_t mixed2_pour_size;
+uint16_t drink1_pour_size;
+uint16_t drink2_pour_size;
+uint16_t mixed1_pour_size;
+uint16_t mixed2_pour_size;
 drink_pour_t drink_pour;
 
 Preferences pour_preferences;
@@ -30,7 +30,7 @@ void init_pour_system() {
     drink_pour.pour_start_time = 0;
 }
 
-void set_pour_size(pour_size_setting_t setting, uint8_t pour_size) {
+void set_pour_size(pour_size_setting_t setting, uint16_t pour_size) {
     pour_preferences.begin("pour", false);
     switch (setting) {
         case DRINK1_POUR_SIZE:
@@ -68,15 +68,17 @@ void start_pour(drink_t drink) {
 void pour_seq_loop() {
     switch (drink_pour.state) {
         case GANTRY_DECENDING:
-            // TODO: Check current limit switch state for low triggered.
-            if (true) {
+            if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW) {
                 drink_pour.pour_start_time = (uint64_t) millis();
                 if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
                 if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
                 drink_pour.state = POURING;
+                Serial.println("Gantry down all done switching to pouring.");
+            } else {
+                set_motor_state(&gantry, MOTOR_DOWN);
             }
             break;
-        case POURING:
+        case POURING: {
             uint64_t pour_time = (uint64_t) millis() - drink_pour.pour_start_time;
             switch (drink_pour.drink) {
                 case DRINK1:
@@ -84,6 +86,7 @@ void pour_seq_loop() {
                         set_motor_state(&pump1, MOTOR_OFF);
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
+                        Serial.println("Pouring complete switching to gantry up.");
                     }
                     break;
                 case DRINK2:
@@ -91,6 +94,7 @@ void pour_seq_loop() {
                         set_motor_state(&pump2, MOTOR_OFF);
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
+                        Serial.println("Pouring complete switching to gantry up.");
                     }
                     break;
                 case MIXED:
@@ -103,13 +107,19 @@ void pour_seq_loop() {
                     if (pump1_done && pump2_done) {
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
+                        Serial.println("Pouring complete switching to gantry up.");
                     }
                     break;
             }
             break;
+        }
         case GANTRY_ASCENDING:
-            // TODO: Check current limit switch state for high triggered.
-            if (true)   drink_pour.state = IDLE;
+            if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
+                drink_pour.state = IDLE;
+                Serial.println("Gantry up all done switching to idle.");
+            } else {
+                set_motor_state(&gantry, MOTOR_UP);
+            }
             break;
         case IDLE:
             break;

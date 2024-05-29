@@ -16,12 +16,15 @@
 #define PUMP1_ENABLE_PIN 16
 
 #define PUMP2_HIGH_PIN 15
-#define PUMP2_LOW_PIN 4
-#define PUMP2_ENABLE_PIN 14
+#define PUMP2_LOW_PIN 13
+#define PUMP2_ENABLE_PIN 12
 
 #define GANTRY_UP_PIN 21
 #define GANTRY_DOWN_PIN 19
 #define GANTRY_ENABLE_PIN 18
+
+#define LIMIT_SWITCH_TOP 34
+#define LIMIT_SWITCH_BOTTOM 35
 
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \
@@ -59,6 +62,12 @@ extern motor_t pump1;
 extern motor_t pump2;
 extern motor_t gantry;
 
+
+/**
+ * @brief Initialize the limit switches.
+*/
+void init_limit_switches();
+
 /**
  * @brief Initialize the pump pins and initial running state.
  * 
@@ -68,6 +77,11 @@ extern motor_t gantry;
 void init_motor(motor_t *motor);
 
 /**
+ * @brief Initialize all motors.
+*/
+void init_motors();
+
+/**
  * @brief Sets a motor state.
  * 
  * @param motor
@@ -75,6 +89,11 @@ void init_motor(motor_t *motor);
  * @return bool True if the state was set, false if the state was invalid.
  */
 bool set_motor_state(motor_t *motor, motor_state_t state);
+
+/**
+ * @brief Disable the motor interrupt service routine.
+*/
+void IRAM_ATTR disable_motor_isr();
 
 
 #endif // PUMP_H

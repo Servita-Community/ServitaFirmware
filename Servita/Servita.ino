@@ -35,8 +35,6 @@ Preferences preferences;
 const char *ssid = "Servita";
 
 #define userButton 32       // Dispense Button
-#define limitSwitchHigh 34  // Top Limit Switch
-#define limitSwitchLow 35   // Bottom Limit Switch
 #define boardLED 2          // User LED
 
 #define LED_PIN 4    // External RGB LED Data Pin
@@ -59,14 +57,8 @@ unsigned long current_time;
 int pourSize[] = { 3000, 3000, 1500, 1500 };
 bool deviceLockout = false;
 
-// Flags used by limit switch interrupt
-bool endStopHighTrigger = false;
-bool endStopLowTrigger = false;
-
 // State variables used for hardware inputs
 uint8_t userButtonState;
-uint8_t limitSwitchHighState;
-uint8_t limitSwitchLowState;
 uint8_t duoButtonState;
 
 // Variables used for external LED array control FastLED Library
@@ -96,14 +88,6 @@ SerialCommand sCmd;  // Constructor for serialCommand handler
 // This gets set as the default handler, and gets called when no other command matches.
 void unrecognized(const char *command) {
   Serial.println("What?");
-}
-
-// Functions called by limit switch interrupt. endStopHighTrigger and endStopLowTrigger flags are used in main loop to perform stop action.
-void IRAM_ATTR endStopHigh() {
-  endStopHighTrigger = true;
-}
-void IRAM_ATTR endStopLow() {
-  endStopLowTrigger = true;
 }
 
 // WebApp Integration
@@ -194,16 +178,20 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
         int s2Mult = size2Val * 1000;
         if (strcmp(parts[1], "drink1") == 0) {
           Serial.println("Pouring Drink 1");
-          setPourSize(1, s1Mult);
+          Serial.println("Setting Pour Size: " + String(s1Mult) + "ms");
+          set_pour_size(DRINK1_POUR_SIZE, s1Mult);
           drink1();
         } else if (strcmp(parts[1], "drink2") == 0) {
           Serial.println("Pouring Drink 2");
-          setPourSize(2, s2Mult);
+          Serial.println("Setting Pour Size: " + String(s2Mult) + "ms");
+          set_pour_size(DRINK2_POUR_SIZE, s2Mult);
           drink2();
         } else if (strcmp(parts[1], "drink3") == 0) {
           Serial.println("Pouring Drink 3");
-          setPourSize(1, s1Mult);
-          setPourSize(2, s2Mult);
+          Serial.println("Setting Pour Size: " + String(s1Mult) + "ms");
+          Serial.println("Setting Pour Size: " + String(s2Mult) + "ms");
+          set_pour_size(MIXED_POUR_1_SIZE, s1Mult);
+          set_pour_size(MIXED_POUR_2_SIZE, s2Mult);
           drink3();
         } else if (strcmp(parts[1], "pourCancel") == 0) {
           Serial.println("User Cancel");
@@ -300,24 +288,6 @@ void connectToWiFi(const char *ssid, const char *pass) {
   }
 }
 
-//mDNS Code - To be resolved
-/* 
-void setupmDNS() {
-  // Set up mDNS responder:
-  // - first argument is the domain name, in this example
-  //   the fully-qualified domain name is "esp32.local"
-  // - second argument is the IP address to advertise
-  //   we send our IP address on the WiFi network
-  if (!MDNS.begin("servita")) {
-    Serial.println("Error setting up MDNS responder!");
-    while (1) {
-      delay(1000);
-    }
-  }
-  Serial.println("mDNS responder started");
-}
-*/
-
 void setup() {
   Serial.begin(115200);
   preferences.begin("wifi", false);
@@ -348,26 +318,15 @@ void setup() {
   sCmd.addCommand("x", abort_pour);
   sCmd.setDefaultHandler(unrecognized);
 
-  // Initialize motor pins and states
-  init_motor(&pump1);
-  init_motor(&pump2);
-  init_motor(&gantry);
-
-  // Initialize pour system
+  // Iniitialize systems
+  init_limit_switches();
+  init_motors();
   init_pour_system();
 
   // Set hardware input pin configurations
-  pinMode(limitSwitchLow, INPUT);
-  pinMode(limitSwitchHigh, INPUT);
   pinMode(userButton, INPUT_PULLUP);
   pinMode(duoButton, INPUT_PULLUP);
 
-  // Create interrupts for both limit switches
-  attachInterrupt(limitSwitchHigh, endStopHigh, FALLING);
-  attachInterrupt(limitSwitchLow, endStopLow, FALLING);
-
-  // Send elevator to the top if not already there
-  if (digitalRead(limitSwitchHigh) == 1)  set_motor_state(&gantry, MOTOR_UP);
   // WebApp - Start WebSocket
   initWebSocket();
   // Print ESP Local IP Address
@@ -383,21 +342,7 @@ void loop() {
   sCmd.readSerial();               // We don't do much, just process serial commands
   dnsServer.processNextRequest();  // wifi related
 
-
-  // Response to limit switch hardware interrupt
-  if (endStopHighTrigger && gantry.state == MOTOR_UP) {
-    set_motor_state(&gantry, MOTOR_OFF);
-    endStopHighTrigger = false;
-    Serial.println("endStopHigh");
-  }
-  if (endStopLowTrigger && gantry.state == MOTOR_DOWN) {
-    set_motor_state(&gantry, MOTOR_OFF);
-    endStopLowTrigger = false;
-    Serial.println("endStopLow");
-  }
-
   pour_seq_loop();
-
   readButtons();  // Read inputs on every loop
 
   // Clean up socket connections
@@ -444,16 +389,12 @@ void drink3() {
 
 // Reads hardware input pins.
 void readButtons() {
-  limitSwitchHighState = digitalRead(limitSwitchHigh);
-  limitSwitchLowState = digitalRead(limitSwitchLow);
   userButtonState = digitalRead(userButton);
   duoButtonState = digitalRead(duoButton);
 }
 
 // Prints state of input pins to serial console.
 void printButtons() {
-  Serial.println("limitSwitchHighState: " + String(limitSwitchHighState));
-  Serial.println("limitSwitchLowState: " + String(limitSwitchLowState));
   Serial.println("userButtonState: " + String(userButtonState));
   Serial.println("duoButtonState: " + String(duoButtonState));
 }
