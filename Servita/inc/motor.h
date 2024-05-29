@@ -21,7 +21,7 @@
 
 #define GANTRY_UP_PIN 21
 #define GANTRY_DOWN_PIN 19
-#define GANTRY_ENABLE_PIN 22
+#define GANTRY_ENABLE_PIN 18
 
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \

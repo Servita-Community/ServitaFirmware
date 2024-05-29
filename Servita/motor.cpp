@@ -29,7 +29,7 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
         case MOTOR_OFF:
             digitalWrite(motor->high_pin, LOW);
             digitalWrite(motor->low_pin, LOW);
-            digitalWrite(motor->enable_pin, LOW);
+            digitalWrite(motor->enable_pin, HIGH);
             break;
         case MOTOR_ON:
             if (motor->type == GANTRY)          return false;
