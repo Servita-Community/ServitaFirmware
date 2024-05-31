@@ -38,10 +38,10 @@ typedef struct {
 } drink_pour_t;
 
 
-extern uint16_t drink1_pour_size;
-extern uint16_t drink2_pour_size;
-extern uint16_t mixed1_pour_size;
-extern uint16_t mixed2_pour_size;
+extern uint32_t drink1_pour_size;
+extern uint32_t drink2_pour_size;
+extern uint32_t mixed1_pour_size;
+extern uint32_t mixed2_pour_size;
 
 extern drink_pour_t drink_pour;
 
@@ -56,7 +56,7 @@ void init_pour_system();
  * @param drink The drink to set the pour size for.
  * @param pour_size The pour size to set.
 */
-void set_pour_size(pour_size_setting_t setting, uint16_t pour_size);
+void set_pour_size(pour_size_setting_t setting, uint32_t pour_size);
 
 /**
  * @brief Start the pour sequence for a drink.
