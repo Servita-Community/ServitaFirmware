@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "inc/button.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
 #include "inc/serial_cmd.h"
@@ -33,13 +34,11 @@ DNSServer dnsServer;
 Preferences preferences;
 const char *ssid = "Servita";
 
-#define userButton 32       // Dispense Button
 #define boardLED 2          // User LED
 
 #define LED_PIN 4    // External RGB LED Data Pin
 #define NUM_LEDS 48  // Number of LEDs on External LED Array
 
-#define duoButton 27  //
 #define ExtIO2 26     //
 #define ExtIO3 25     //
 
@@ -56,19 +55,12 @@ unsigned long current_time;
 int pourSize[] = { 3000, 3000, 1500, 1500 };
 bool deviceLockout = false;
 
-// State variables used for hardware inputs
-uint8_t userButtonState;
-uint8_t duoButtonState;
-
 // Variables used for external LED array control FastLED Library
 int ledBrightness = 255;
 const int ledMax = 255;
 const int ledMin = 75;
 int fadeFlag = 0;
 CRGB leds[NUM_LEDS];
-
-void printButtons();
-void readButtons();
 
 // This gets set as the default handler, and gets called when no other command matches.
 void unrecognized(const char *command) {
@@ -309,10 +301,7 @@ void setup() {
   init_motors();
   init_pour_system();
   init_serial_commands();
-
-  // Set hardware input pin configurations
-  pinMode(userButton, INPUT_PULLUP);
-  pinMode(duoButton, INPUT_PULLUP);
+  init_buttons();
 
   // WebApp - Start WebSocket
   initWebSocket();
@@ -330,14 +319,7 @@ void loop() {
   dnsServer.processNextRequest();  // wifi related
 
   pour_seq_loop();
-  readButtons();  // Read inputs on every loop
+  button_loop();
 
-  // Clean up socket connections
   ws.cleanupClients();
-}
-
-// Reads hardware input pins.
-void readButtons() {
-  userButtonState = digitalRead(userButton);
-  duoButtonState = digitalRead(duoButton);
 }
