@@ -1,10 +1,8 @@
 /**
  * @file motor.cpp
- * @author Tyler Bair (tyler.bair@protonmail.com)
  * @brief Pump pins, functions, and variables.
  * @version 0.1
  * @date 2024-05-28
- * 
  */
 #include "inc/motor.h"
 

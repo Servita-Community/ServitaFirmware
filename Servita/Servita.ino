@@ -6,13 +6,12 @@
 //    Serial commands created for operation and hardware debug.
 
 #include <FastLED.h>
-#include <SerialCommand.h>
-
 #include <string.h>
 #include <stdlib.h>
 
 #include "inc/motor.h"
 #include "inc/pour.h"
+#include "inc/serial_cmd.h"
 #include "inc/main_html.h"
 #include "inc/captive_html.h"
 
@@ -68,22 +67,8 @@ const int ledMin = 75;
 int fadeFlag = 0;
 CRGB leds[NUM_LEDS];
 
-
-//Forward definition - Prototyping
-void drink1();
-void drink2();
-void drink3();
-void motor2down();
-void motor2up();
-void motor2stop();
-void setPourSize(int pourOption, int time);
-void printPourSizes();
-void serial_setPourSize();
-void serial_setDeviceLockout();
 void printButtons();
 void readButtons();
-
-SerialCommand sCmd;  // Constructor for serialCommand handler
 
 // This gets set as the default handler, and gets called when no other command matches.
 void unrecognized(const char *command) {
@@ -180,19 +165,34 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
           Serial.println("Pouring Drink 1");
           Serial.println("Setting Pour Size: " + String(s1Mult) + "ms");
           set_pour_size(DRINK1_POUR_SIZE, s1Mult);
-          drink1();
+          if (!deviceLockout) {
+            start_pour(DRINK1);
+          }
+          else {
+            Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
+          }
         } else if (strcmp(parts[1], "drink2") == 0) {
           Serial.println("Pouring Drink 2");
           Serial.println("Setting Pour Size: " + String(s2Mult) + "ms");
           set_pour_size(DRINK2_POUR_SIZE, s2Mult);
-          drink2();
+          if (!deviceLockout) {
+            start_pour(DRINK2);
+          }
+          else {
+            Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
+          }
         } else if (strcmp(parts[1], "drink3") == 0) {
           Serial.println("Pouring Drink 3");
           Serial.println("Setting Pour Size: " + String(s1Mult) + "ms");
           Serial.println("Setting Pour Size: " + String(s2Mult) + "ms");
           set_pour_size(MIXED_POUR_1_SIZE, s1Mult);
           set_pour_size(MIXED_POUR_2_SIZE, s2Mult);
-          drink3();
+          if (!deviceLockout) {
+            start_pour(MIXED);
+          }
+          else {
+            Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
+          }
         } else if (strcmp(parts[1], "pourCancel") == 0) {
           Serial.println("User Cancel");
           abort_pour();
@@ -303,25 +303,12 @@ void setup() {
   }
 
   delay(100);
-  // Create serial commands and limk them to functions
-  sCmd.addCommand("drink1", drink1);
-  sCmd.addCommand("drink2", drink2);
-  sCmd.addCommand("drink3", drink3);
-  sCmd.addCommand("poursize", serial_setPourSize);
-  sCmd.addCommand("printpoursizes", printPourSizes);
-  sCmd.addCommand("lock", serial_setDeviceLockout);
-  sCmd.addCommand("down", motor2down);
-  sCmd.addCommand("up", motor2up);
-  sCmd.addCommand("s", motor2stop);
-  sCmd.addCommand("read", printButtons);
-  sCmd.addCommand("cancel", abort_pour);
-  sCmd.addCommand("x", abort_pour);
-  sCmd.setDefaultHandler(unrecognized);
 
   // Iniitialize systems
   init_limit_switches();
   init_motors();
   init_pour_system();
+  init_serial_commands();
 
   // Set hardware input pin configurations
   pinMode(userButton, INPUT_PULLUP);
@@ -339,7 +326,7 @@ void setup() {
 }
 
 void loop() {
-  sCmd.readSerial();               // We don't do much, just process serial commands
+  process_serial_command();
   dnsServer.processNextRequest();  // wifi related
 
   pour_seq_loop();
@@ -349,64 +336,8 @@ void loop() {
   ws.cleanupClients();
 }
 
-// Serial Command Handler to set pour size
-void serial_setPourSize() {
-  setPourSize(atoi(sCmd.next()), atoi(sCmd.next()));
-  printPourSizes();
-}
-
-// Serial Command Handler to set lockout state
-void serial_setDeviceLockout() {
-  deviceLockout = atoi(sCmd.next());
-  Serial.println("Lockout State: " + String(deviceLockout));
-}
-
-// Set each pour size in ms.
-void setPourSize(int pourOption, int time) {
-  pourSize[pourOption] = time;
-}
-
-// Function to initiate dispense of drink 1. Requires lockout state to be 0 to operate.
-void drink1() {
-  if (!deviceLockout) {
-    start_pour(DRINK1);
-  } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
-}
-
-// Function to initiate dispense of drink 2. Requires lockout state to be 0 to operate.
-void drink2() {
-  if (!deviceLockout) {
-    start_pour(DRINK2);
-  } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
-}
-
-// Function to initiate dispense of drink 3 (mix from both pumps). Requires lockout state to be 0 to operate.
-void drink3() {
-  if (!deviceLockout) {
-    start_pour(MIXED);
-  } else Serial.println("Device Lockout Enabled. Dispense Command Rejected.");
-}
-
 // Reads hardware input pins.
 void readButtons() {
   userButtonState = digitalRead(userButton);
   duoButtonState = digitalRead(duoButton);
 }
-
-// Prints state of input pins to serial console.
-void printButtons() {
-  Serial.println("userButtonState: " + String(userButtonState));
-  Serial.println("duoButtonState: " + String(duoButtonState));
-}
-
-// Prints current pour size setting to serial console.
-void printPourSizes() {
-  Serial.println("pour size 0 = " + String(pourSize[0]));
-  Serial.println("pour size 1 = " + String(pourSize[1]));
-  Serial.println("pour size 2 = " + String(pourSize[2]));
-  Serial.println("pour size 3 = " + String(pourSize[3]));
-}
-
-void motor2down() {   set_motor_state(&gantry, MOTOR_DOWN); }
-void motor2up() {     set_motor_state(&gantry, MOTOR_UP);   }
-void motor2stop() {   set_motor_state(&gantry, MOTOR_OFF);  }
