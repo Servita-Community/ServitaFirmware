@@ -107,29 +107,20 @@ These files can then be referenced in the HTML, allowing for easier updates and 
 4. Add the ESP32 board support:
     ```sh
     arduino-cli core update-index
-    arduino-cli core install esp32:esp32
+    arduino-cli core install esp32:esp32@2.0.16
     ```
 
 ### Install Required Libraries
 
-1. Install the required libraries using the Arduino CLI:
-    ```sh
-    arduino-cli lib install "FastLED"
-    arduino-cli lib install "WiFi"
-    arduino-cli lib install "AsyncTCP"
-    arduino-cli lib install "ESP Async WebServer"
-    arduino-cli lib install "FS"
-    arduino-cli lib install "DNSServer"
-    arduino-cli lib install "Preferences"
-    ```
-
-2. Manually install the SerialCommand library:
-    ```sh
-    git clone https://github.com/kroimon/Arduino-SerialCommand.git
-    mv Arduino-SerialCommand %YOUR_ARDUINO_LIB_PATH%/SerialCommand
-    ```
-    Replace `%YOUR_ARDUINO_LIB_PATH%` with the path to your Arduino libraries directory. This can be
-    found in the Arduino IDE under `File > Preferences > Sketchbook location`.
+```sh
+arduino-cli lib install "FastLED@3.7.0"
+arduino-cli lib install "WiFi@2.0.0"
+arduino-cli lib install "AsyncTCP@1.1.4"
+arduino-cli lib install "ESP Async WebServer@2.10.0"
+arduino-cli lib install "FS@2.0.0"
+arduino-cli lib install "DNSServer@2.0.0"
+arduino-cli lib install "Preferences@2.0.0"
+```
 
 ### Compilation and Upload
 
