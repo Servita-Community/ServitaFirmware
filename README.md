@@ -90,7 +90,12 @@ These files can then be referenced in the HTML, allowing for easier updates and 
 3. Add the ESP32 board support:
     ```sh
     arduino-cli core update-index
-    arduino-cli core install esp32:esp32
+    arduino-cli core install esp32:esp32@2.0.16
+    ```
+
+4. Install the required python packages:
+    ```sh
+    pip install pyserial
     ```
 
 #### Windows
@@ -116,7 +121,7 @@ These files can then be referenced in the HTML, allowing for easier updates and 
 arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "WiFi@2.0.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
-arduino-cli lib install "ESP Async WebServer@2.10.0"
+arduino-cli lib install "ESPAsyncWebServer@3.1.0"
 arduino-cli lib install "FS@2.0.0"
 arduino-cli lib install "DNSServer@2.0.0"
 arduino-cli lib install "Preferences@2.0.0"
