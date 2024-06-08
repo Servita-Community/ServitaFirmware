@@ -8,6 +8,7 @@
 #include "inc/serial_cmd.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
+#include "esp_system.h"
 
 // Define commands
 serial_command_t serial_commands[] = {
@@ -24,6 +25,7 @@ serial_command_t serial_commands[] = {
     {"up", [](){ set_motor_state(&gantry, MOTOR_UP); }},
     {"stop", [](){ set_motor_state(&gantry, MOTOR_OFF); }},
     {"cancel", abort_pour},
+    {"restart", esp_restart},
 };
 
 // Number of commands

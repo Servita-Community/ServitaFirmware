@@ -6,3 +6,10 @@
 */
 
 #include "inc/credentials.h"
+
+
+void delete_credentials() {
+    // Delete the stored WiFi credentials
+    WiFi.disconnect(true);
+    Serial.println("Deleted stored WiFi credentials.");
+}

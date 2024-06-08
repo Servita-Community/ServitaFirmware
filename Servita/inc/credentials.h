@@ -12,5 +12,8 @@
 #include <WiFi.h>
 
 
+void delete_credentials();
+
+
 
 #endif  // CREDENTIALS_H
