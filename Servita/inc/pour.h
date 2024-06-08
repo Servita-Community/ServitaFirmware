@@ -44,8 +44,8 @@ extern uint32_t drink1_pour_size;
 extern uint32_t drink2_pour_size;
 extern uint32_t mixed1_pour_size;
 extern uint32_t mixed2_pour_size;
-
 extern drink_pour_t drink_pour;
+extern bool lockout;
 
 /**
  * @brief Initialize the pour system by setting the pour sizes and the drink pour state.
@@ -86,5 +86,10 @@ void validate_and_convert_size(const char* size, uint32_t* pour_size);
  * @brief Handle a websocket pour json message.
 */
 void handle_pour_json(JsonObject payload);
+
+/**
+ * @brief Handle a websocket lock json message.
+*/
+void handle_lock_json(JsonObject payload);
 
 #endif // POUR_H

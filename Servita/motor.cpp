@@ -47,13 +47,13 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
             digitalWrite(motor->enable_pin, HIGH);
             break;
         case MOTOR_ON:
-            if (motor->type == GANTRY)                          return false;
+            if (motor->type == GANTRY)               return false;
             digitalWrite(motor->high_pin, HIGH);
             digitalWrite(motor->low_pin, LOW);
             digitalWrite(motor->enable_pin, HIGH);
             break;
         case MOTOR_UP:
-            if (motor->type != GANTRY)                          return false;
+            if (motor->type != GANTRY)               return false;
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW)           return false;
 
             digitalWrite(motor->high_pin, HIGH);
@@ -61,7 +61,7 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
             digitalWrite(motor->enable_pin, HIGH);
             break;
         case MOTOR_DOWN:
-            if (motor->type != GANTRY)                          return false;
+            if (motor->type != GANTRY)               return false;
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW)        return false;
 
             digitalWrite(motor->high_pin, LOW);

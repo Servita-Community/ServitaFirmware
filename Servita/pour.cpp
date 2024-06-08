@@ -15,6 +15,7 @@ uint32_t drink2_pour_size;
 uint32_t mixed1_pour_size;
 uint32_t mixed2_pour_size;
 drink_pour_t drink_pour;
+bool lockout = false;
 
 Preferences pour_preferences;
 
@@ -64,6 +65,11 @@ void start_pour(drink_t drink) {
         return;
     }
 
+    if (lockout) {
+        Serial.println("Motor lockout in effect, cannot pour.");
+        return;
+    }
+
     drink_pour.drink = drink;
     set_motor_state(&gantry, MOTOR_DOWN);
     drink_pour.state = GANTRY_DECENDING;
@@ -71,6 +77,8 @@ void start_pour(drink_t drink) {
 }
 
 void pour_seq_loop() {
+    if (lockout)        return;
+
     switch (drink_pour.state) {
         case GANTRY_DECENDING:
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW) {
@@ -185,5 +193,15 @@ void handle_pour_json(JsonObject payload) {
         abort_pour();
     } else {
         Serial.println("Unknown drink type.");
+    }
+}
+
+void handle_lock_json(JsonObject payload) {
+    const char *action = payload["action"];
+    if (strcmp(action, "lock") == 0) {
+        abort_pour();
+        lockout = true;
+    } else if (strcmp(action, "unlock") == 0) {
+        lockout = false;
     }
 }

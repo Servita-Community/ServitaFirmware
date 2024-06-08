@@ -112,7 +112,7 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             } else if (strcmp(type, "net") == 0) {
                 handle_net_json(client, payload);
             } else if (strcmp(type, "lock") == 0) {
-                // handleLock(payload);
+                handle_lock_json(payload);
             } else if (strcmp(type, "lnum") == 0) {
                 // handleLNum(payload);
             } else {
