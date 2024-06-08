@@ -9,6 +9,7 @@
 #define PUMP_H
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 #define PUMP1_HIGH_PIN 17
 #define PUMP1_LOW_PIN 5
@@ -93,6 +94,11 @@ bool set_motor_state(motor_t *motor, motor_state_t state);
  * @brief Disable the motor interrupt service routine.
 */
 void IRAM_ATTR disable_motor_isr();
+
+/**
+ * @brief Handle the motor JSON payload.
+*/
+void handle_motor_json(JsonObject payload);
 
 
 #endif // PUMP_H

@@ -917,7 +917,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         console.log('mousedown event');
                     }, false);
                     mCarUp.addEventListener('mouseup', function () {
-                        sendMessage('manual', { action: 'stop' });
+                        sendMessage('manual', { action: 'mCarStop' });
                         console.log('mouseup event');
                     }, false);
                     mCarUp.addEventListener('touchstart', function () {
@@ -925,7 +925,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         console.log('touchstart event');
                     }, false);
                     mCarUp.addEventListener('touchend', function () {
-                        sendMessage('manual', { action: 'stop' });
+                        sendMessage('manual', { action: 'mCarStop' });
                         console.log('touchend event');
                     }, false);
 
@@ -934,7 +934,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         console.log('mousedown event');
                     }, false);
                     mCarDown.addEventListener('mouseup', function () {
-                        sendMessage('manual', { action: 'stop' });
+                        sendMessage('manual', { action: 'mCarStop' });
                         console.log('mouseup event');
                     }, false);
                     mCarDown.addEventListener('touchstart', function () {
@@ -942,41 +942,41 @@ const char main_html[] PROGMEM = R"rawliteral(
                         console.log('touchstart event');
                     }, false);
                     mCarDown.addEventListener('touchend', function () {
-                        sendMessage('manual', { action: 'stop' });
+                        sendMessage('manual', { action: 'mCarStop' });
                         console.log('touchend event');
                     }, false);
 
                     rPump1.addEventListener('mousedown', function () {
-                        sendMessage('manual', { action: 'start', pump: 'rPump1' });
+                        sendMessage('manual', { action: 'rPump1Start' });
                         console.log('mousedown event');
                     }, false);
                     rPump1.addEventListener('mouseup', function () {
-                        sendMessage('manual', { action: 'stop', pump: 'rPump1' });
+                        sendMessage('manual', { action: 'rPump1Stop' });
                         console.log('mouseup event');
                     }, false);
                     rPump1.addEventListener('touchstart', function () {
-                        sendMessage('manual', { action: 'start', pump: 'rPump1' });
+                        sendMessage('manual', { action: 'rPump1Start' });
                         console.log('touchstart event');
                     }, false);
                     rPump1.addEventListener('touchend', function () {
-                        sendMessage('manual', { action: 'stop', pump: 'rPump1' });
+                        sendMessage('manual', { action: 'rPump1Stop' });
                         console.log('touchend event');
                     }, false);
 
                     rPump2.addEventListener('mousedown', function () {
-                        sendMessage('manual', { action: 'start', pump: 'rPump2' });
+                        sendMessage('manual', { action: 'rPump2Start' });
                         console.log('mousedown event');
                     }, false);
                     rPump2.addEventListener('mouseup', function () {
-                        sendMessage('manual', { action: 'stop', pump: 'rPump2' });
+                        sendMessage('manual', { action: 'rPump2Stop' });
                         console.log('mouseup event');
                     }, false);
                     rPump2.addEventListener('touchstart', function () {
-                        sendMessage('manual', { action: 'start', pump: 'rPump2' });
+                        sendMessage('manual', { action: 'rPump2Start' });
                         console.log('touchstart event');
                     }, false);
                     rPump2.addEventListener('touchend', function () {
-                        sendMessage('manual', { action: 'stop', pump: 'rPump2' });
+                        sendMessage('manual', { action: 'rPump2Stop' });
                         console.log('touchend event');
                     }, false);
 

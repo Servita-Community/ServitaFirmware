@@ -4,6 +4,7 @@
  * @version 0.1
  * @date 2024-05-28
  */
+#include <ArduinoJson.h>
 #include "inc/motor.h"
 
 motor_t pump1 = {PUMP1_HIGH_PIN, PUMP1_LOW_PIN, PUMP1_ENABLE_PIN, MOTOR_OFF, PUMP1};
@@ -74,4 +75,25 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
 
 void IRAM_ATTR disable_motor_isr() {
     set_motor_state(&gantry, MOTOR_OFF);
+}
+
+void handle_motor_json(JsonObject payload) {
+    const char *action = payload["action"];
+    if (strcmp(action, "mCarUp") == 0) {
+        set_motor_state(&gantry, MOTOR_UP);
+    } else if (strcmp(action, "mCarDown") == 0) {
+        set_motor_state(&gantry, MOTOR_DOWN);
+    } else if (strcmp(action, "mCarStop") == 0) {
+        set_motor_state(&gantry, MOTOR_OFF);
+    } else if (strcmp(action, "rPump1Start") == 0) {
+        set_motor_state(&pump1, MOTOR_ON);
+    } else if (strcmp(action, "rPump1Stop") == 0) {
+        set_motor_state(&pump1, MOTOR_OFF);
+    } else if (strcmp(action, "rPump2Start") == 0) {
+        set_motor_state(&pump2, MOTOR_ON);
+    } else if (strcmp(action, "rPump2Stop") == 0) {
+        set_motor_state(&pump2, MOTOR_OFF);
+    } else if (strcmp(action, "mCarHome") == 0) {
+        set_motor_state(&gantry, MOTOR_UP);
+    }
 }

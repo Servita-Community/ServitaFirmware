@@ -7,6 +7,7 @@
 
 #include "inc/server.h"
 #include "inc/main_html.h"
+#include "inc/motor.h"
 #include "inc/pour.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
@@ -107,7 +108,7 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             } else if (strcmp(type, "brightness") == 0) {
                 // handleBrightness(payload);
             } else if (strcmp(type, "manual") == 0) {
-                // handleManual(payload);
+                handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
                 // handleNet(payload);
             } else if (strcmp(type, "lock") == 0) {
