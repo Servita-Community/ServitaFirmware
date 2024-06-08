@@ -8,7 +8,7 @@
 #include "inc/serial_cmd.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
-#include "inc/captive.h"
+#include "inc/server.h"
 
 // Define commands
 serial_command_t serial_commands[] = {
