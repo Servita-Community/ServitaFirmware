@@ -25,28 +25,13 @@
 //Webapp Config
 AsyncWebServer server(80);
 
-// AP SSID - for captive
-const char *ssid = "Servita";
-
 #define boardLED 2          // User LED
-
 #define LED_PIN 4    // External RGB LED Data Pin
 #define NUM_LEDS 48  // Number of LEDs on External LED Array
-
 #define ExtIO2 26     //
 #define ExtIO3 25     //
 
 // Flags & variables used by non-blocking dispense function
-bool dispenseInProgress = false;
-bool carraigeDownStarted = false;
-bool carraigeReachedBottom = false;
-bool drinkPouringStarted = false;
-bool drinkPouringComplete = false;
-bool carraigeUpStarted = false;
-bool carraigeReachedTop = false;
-unsigned long pour_start_time;
-unsigned long current_time;
-int pourSize[] = { 3000, 3000, 1500, 1500 };
 bool deviceLockout = false;
 
 // Variables used for external LED array control FastLED Library
@@ -55,11 +40,6 @@ const int ledMax = 255;
 const int ledMin = 75;
 int fadeFlag = 0;
 CRGB leds[NUM_LEDS];
-
-// This gets set as the default handler, and gets called when no other command matches.
-void unrecognized(const char *command) {
-  Serial.println("What?");
-}
 
 // WebApp Integration
 // AsyncWebServer server(80);
