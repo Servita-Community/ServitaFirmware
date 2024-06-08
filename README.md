@@ -93,9 +93,14 @@ These files can then be referenced in the HTML, allowing for easier updates and 
     arduino-cli core install esp32:esp32@3.0.1
     ```
 
-4. Install the required python packages:
+4. Install the required Python packages:
     ```sh
     pip install pyserial
+    ```
+
+5. Install Git if it's not already installed:
+    ```sh
+    sudo apt-get install git
     ```
 
 #### Windows
@@ -115,13 +120,37 @@ These files can then be referenced in the HTML, allowing for easier updates and 
     arduino-cli core install esp32:esp32@3.0.1
     ```
 
+5. Install Git if it's not already installed:
+    Download and install Git from the [official Git website](https://git-scm.com/).
+
 ### Install Required Libraries
+
+#### Using Arduino CLI
 
 ```sh
 arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
-arduino-cli lib install "ESP Async WebServer@2.10.5"
 ```
+
+#### Cloning `ESPAsyncWebServer`
+
+Instead of using the version of `ESPAsyncWebServer` that the Arduino CLI automatically installs, clone the repository directly:
+
+1. Navigate to your Arduino libraries folder. The default locations are:
+    - **Linux**: `~/Arduino/libraries`
+    - **Windows**: `C:\Users\<YourUsername>\Documents\Arduino\libraries`
+
+2. Open a terminal (or command prompt) and navigate to the Arduino libraries folder:
+    ```sh
+    cd ~/Arduino/libraries
+    # or for Windows
+    cd C:\Users\<YourUsername>\Documents\Arduino\libraries
+    ```
+
+3. Clone the `ESPAsyncWebServer` repository:
+    ```sh
+    git clone https://github.com/me-no-dev/ESPAsyncWebServer.git
+    ```
 
 ### Compilation and Upload
 
