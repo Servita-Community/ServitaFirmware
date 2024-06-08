@@ -110,7 +110,7 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             } else if (strcmp(type, "manual") == 0) {
                 handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
-                // handleNet(payload);
+                handle_net_json(client, payload);
             } else if (strcmp(type, "lock") == 0) {
                 // handleLock(payload);
             } else if (strcmp(type, "lnum") == 0) {
@@ -120,6 +120,20 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             }
         }
     }
+}
+
+void handle_net_json(AsyncWebSocketClient *client, JsonObject payload) {
+    const char* ssid = payload["ssid"];
+    const char* pass = payload["password"];
+
+    if (ssid == nullptr || pass == nullptr) {
+        Serial.println("Invalid WiFi credentials");
+        return;
+    }
+
+    save_credentials(ssid, pass);
+    delay(2000);  // Small delay to ensure message is sent
+    ESP.restart();
 }
 
 void init_server() {

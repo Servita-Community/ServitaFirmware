@@ -10,12 +10,14 @@
 
 #include <ESPAsyncWebServer.h>
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 void save_credentials(const char *ssid, const char *pass);
 void delete_credentials();
 void get_credentials(String *ssid, String *pass);
 void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 bool connect_to_wifi(const char *ssid, const char *pass);
+void handle_net_json(AsyncWebSocketClient *client, JsonObject payload);
 void init_server();
 void server_loop();
 
