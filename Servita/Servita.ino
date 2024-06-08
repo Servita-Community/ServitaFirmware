@@ -21,12 +21,9 @@
 // WebApp Libraries
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
-#include <DNSServer.h>
 
 //Webapp Config
-const byte DNS_PORT = 53;
 AsyncWebServer server(80);
-DNSServer dnsServer;
 
 // AP SSID - for captive
 const char *ssid = "Servita";
@@ -67,43 +64,6 @@ void unrecognized(const char *command) {
 // WebApp Integration
 // AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
-
-// CaptivePortal Function
-void startCaptivePortal() {
-  Serial.println("Starting Captive Portal");
-
-  // Start the AP with no password
-  WiFi.softAP(ssid, "");
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP Address: ");
-  Serial.println(IP);
-
-  dnsServer.start(53, "*", IP);
-
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.print("User Connected");
-    request->send_P(200, "text/html", captive_html);
-  });
-
-  server.on("/setWiFi", HTTP_POST, [](AsyncWebServerRequest *request) {
-    String ssid;
-    String pass;
-    if (request->hasParam("ssid", true) && request->hasParam("password", true)) {
-      String ssid = request->getParam("ssid", true)->value();
-      String pass = request->getParam("password", true)->value();
-
-      save_credentials(ssid.c_str(), pass.c_str());
-      request->send(200, "text/plain", "Received SSID: " + ssid + "\nPassword: " + pass);
-      delay(3000);
-      ESP.restart();  // Restart ESP to connect with new credentials
-      // Optionally connect to WiFi or save credentials here
-    } else {
-      request->send(400, "text/plain", "Invalid Request");
-    }
-  });
-
-  server.begin();
-}
 
 char *trim(char *str) {
   char *end;
@@ -254,7 +214,6 @@ void connectToWiFi(const char *ssid, const char *pass) {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
-    // setupmDNS();
     Serial.println("Connected to WiFi!");
     Serial.print("IP Address: ");
     Serial.println(WiFi.localIP());
@@ -265,8 +224,7 @@ void connectToWiFi(const char *ssid, const char *pass) {
     server.begin();
   } else {
     Serial.println("Failed to connect to WiFi. Please check credentials.");
-    // Optionally restart the Captive Portal to re-enter credentials
-    startCaptivePortal();
+    start_captive_portal();
   }
 }
 
@@ -276,7 +234,7 @@ void setup() {
   get_credentials(&ssid, &pass);
 
   if (ssid == "" || pass == "") {
-    startCaptivePortal();
+    start_captive_portal();
   } else {
     connectToWiFi(ssid.c_str(), pass.c_str());
   }
@@ -290,23 +248,21 @@ void setup() {
   init_serial_commands();
   init_buttons();
 
-  // WebApp - Start WebSocket
-  initWebSocket();
-  // Print ESP Local IP Address
-  Serial.println(WiFi.localIP());
+  if (!captive) {
+    initWebSocket();
+    Serial.println(WiFi.localIP());
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", main_html);
-  });
-  server.begin();
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send_P(200, "text/html", main_html);
+    });
+    server.begin();
+  }
 }
 
 void loop() {
   process_serial_command();
-  dnsServer.processNextRequest();  // wifi related
-
   pour_seq_loop();
   button_loop();
 
-  ws.cleanupClients();
+  if (!captive)     ws.cleanupClients();
 }
