@@ -9,10 +9,11 @@
 #define CREDENTIALS_H
 
 #include <Arduino.h>
-#include <WiFi.h>
 
 
+void save_credentials(const char *ssid, const char *pass);
 void delete_credentials();
+void get_credentials(String *ssid, String *pass);
 
 
 

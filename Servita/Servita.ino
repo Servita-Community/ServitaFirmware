@@ -12,6 +12,7 @@
 #include "inc/button.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
+#include "inc/captive.h"
 #include "inc/serial_cmd.h"
 #include "inc/main_html.h"
 #include "inc/captive_html.h"
@@ -21,7 +22,6 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
-#include <Preferences.h>
 
 //Webapp Config
 const byte DNS_PORT = 53;
@@ -29,7 +29,6 @@ AsyncWebServer server(80);
 DNSServer dnsServer;
 
 // AP SSID - for captive
-Preferences preferences;
 const char *ssid = "Servita";
 
 #define boardLED 2          // User LED
@@ -92,10 +91,8 @@ void startCaptivePortal() {
     if (request->hasParam("ssid", true) && request->hasParam("password", true)) {
       String ssid = request->getParam("ssid", true)->value();
       String pass = request->getParam("password", true)->value();
-      preferences.begin("wifi", false);
-      preferences.putString("ssid", ssid);
-      preferences.putString("pass", pass);
-      preferences.end();
+
+      save_credentials(ssid.c_str(), pass.c_str());
       request->send(200, "text/plain", "Received SSID: " + ssid + "\nPassword: " + pass);
       delay(3000);
       ESP.restart();  // Restart ESP to connect with new credentials
@@ -213,12 +210,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
         set_motor_state(&pump2, MOTOR_OFF);
       }
     } else if (parts.size() == 3 && strcmp(parts[0], "net") == 0) {
-
-      preferences.begin("wifi", false);
-      preferences.putString("ssid", parts[1]);
-      preferences.putString("pass", parts[2]);
-      preferences.end();
-
+      save_credentials(parts[1], parts[2]);
       ESP.restart();
     } else if (parts.size() == 3 && strcmp(parts[0], "lock") == 0) {
       if (strcmp(parts[1], "lock") == 0) {
@@ -280,11 +272,8 @@ void connectToWiFi(const char *ssid, const char *pass) {
 
 void setup() {
   Serial.begin(115200);
-  preferences.begin("wifi", false);
-  String ssid = preferences.getString("ssid", "");
-  String pass = preferences.getString("pass", "");
-  preferences.end();
-
+  String ssid, pass;
+  get_credentials(&ssid, &pass);
 
   if (ssid == "" || pass == "") {
     startCaptivePortal();
