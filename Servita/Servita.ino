@@ -1,4 +1,6 @@
 #include <FastLED.h>
+#include <esp_system.h>
+#include <esp_log.h>
 
 #include "inc/button.h"
 #include "inc/motor.h"
@@ -22,7 +24,11 @@ const int ledMin = 75;
 int fadeFlag = 0;
 CRGB leds[NUM_LEDS];
 
-unsigned long timeElapsed = 0;
+// Custom panic handler
+void custom_panic_handler(void) {
+  ESP_LOGE("PANIC", "A panic occurred, restarting now...");
+  ESP.restart();
+}
 
 void setup() {
   Serial.begin(115200);
@@ -37,6 +43,8 @@ void setup() {
   init_buttons();
   init_server();
 
+  esp_register_fatal_exception_handler(custom_panic_handler);
+
   Serial.println("Setup complete");
 }
 
@@ -45,15 +53,4 @@ void loop() {
   pour_seq_loop();
   button_loop();
   server_loop();
-
-  // Print statistics every 5 seconds
-  if (millis() - timeElapsed > 5000) {
-    Serial.println("----- Debugging Statistics -----");
-    Serial.print("Free Memory: ");
-    Serial.println(freeMemory());
-    Serial.println("--------------------------------");
-
-    // Reset the timer and counters
-    timeElapsed = millis();
-  }
 }
