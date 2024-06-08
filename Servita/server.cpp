@@ -7,10 +7,12 @@
 
 #include "inc/server.h"
 #include "inc/main_html.h"
+#include "inc/pour.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
 #include <Preferences.h>
+#include <ArduinoJson.h>
 
 
 AsyncWebServer server(80);
@@ -79,14 +81,42 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
         Serial.printf("WebSocket client #%u disconnected\n", client->id());
     } else if (type == WS_EVT_ERROR) {
         Serial.printf("WebSocket client #%u error\n", client->id());
-    } else if (type == WS_EVT_PONG) {
-        Serial.printf("WebSocket client #%u pong\n", client->id());
-        client->ping(NULL, 0);
     } else if (type == WS_EVT_DATA) {
         AwsFrameInfo *info = (AwsFrameInfo *)arg;
         if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
             data[len] = 0;
             Serial.printf("WebSocket client #%u message: %s\n", client->id(), (char *)data);
+
+            // Parse JSON message
+            StaticJsonDocument<512> doc;
+            DeserializationError error = deserializeJson(doc, (char*)data);
+
+            if (error) {
+                Serial.print("deserializeJson() failed: ");
+                Serial.println(error.c_str());
+                return;
+            }
+
+            const char* type = doc["type"];
+            JsonObject payload = doc["payload"];
+
+            if (strcmp(type, "pour") == 0) {
+                handle_pour_json(payload);
+            } else if (strcmp(type, "led") == 0) {
+                // handleLED(payload);
+            } else if (strcmp(type, "brightness") == 0) {
+                // handleBrightness(payload);
+            } else if (strcmp(type, "manual") == 0) {
+                // handleManual(payload);
+            } else if (strcmp(type, "net") == 0) {
+                // handleNet(payload);
+            } else if (strcmp(type, "lock") == 0) {
+                // handleLock(payload);
+            } else if (strcmp(type, "lnum") == 0) {
+                // handleLNum(payload);
+            } else {
+                Serial.println("Unknown message type");
+            }
         }
     }
 }

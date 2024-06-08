@@ -877,69 +877,131 @@ const char main_html[] PROGMEM = R"rawliteral(
                     
                 }
                     
-                    
-                    
-            
-
-                
-                /*
-                function initWebSocket(gateway) {
-                    console.log('Trying to open a WebSocket connection...');
-                    websocket = new WebSocket(gateway);
-                    websocket.onopen = onOpen;
-                    websocket.onclose = onClose;
-                    // websocket.onmessage = onMessage; // <-- add this line
-                }
-                function onOpen(event) {
-                    console.log('Connection opened');
-                }
-                function onClose(event) {
-                    console.log('Connection closed');
-                    setTimeout(initWebSocket, 2000);
-                }
-                */
                 window.addEventListener('load', onLoad, false);
                 function onLoad(event) {
                     initSliders(); 
                 }
-                function initButton() {                    
-                drink1Button.addEventListener('click', function () { websocket.send('pour,drink1,' + p1Range.value + ',0,end') }, false);
-                drink2Button.addEventListener('click', function () { websocket.send('pour,drink2,0,' + p2Range.value + ',end') }, false);
-                drink3Button.addEventListener('click', function () { websocket.send('pour,drink3,' + p3Range1.value + ',' + p3Range2.value + ',end') }, false);
-                cancelButton.addEventListener('click', function () { websocket.send('pour,pourCancel,0,0,end') }, false);
-                rgbButton.addEventListener('click', function () { websocket.send('led,' + getRgbVal() +',end') }, false);
-                brightSend.addEventListener('click', function () { websocket.send('brightnness,' + getBrightness() + ',end') }, false);
-                mCarUp.addEventListener('mousedown', function () { websocket.send('manual,mCarUp,end'); console.log('mousedown event') }, false);
-                mCarUp.addEventListener('mouseup', function () { websocket.send('manual,stop,end'); console.log('mouseup event') }, false);
-                mCarUp.addEventListener('touchstart', function () { websocket.send('manual,mCarUp,end'); console.log('touchstart event') }, false);
-                mCarUp.addEventListener('touchend', function () { websocket.send('manual,stop,end'); console.log('touchend event') }, false);
-                mCarDown.addEventListener('mousedown', function () { websocket.send('manual,mCarDown,end'); console.log('mousedown event') }, false);
-                mCarDown.addEventListener('mouseup', function () { websocket.send('manual,stop,end'); console.log('mouseup event') }, false);
-                mCarDown.addEventListener('touchstart', function () { websocket.send('manual,mCarDown,end'); console.log('touchstart event') }, false);
-                mCarDown.addEventListener('touchend', function () { websocket.send('manual,stop,end'); console.log('touchend event') }, false);
-                rPump1.addEventListener('mousedown', function () { websocket.send('manual,start,rPump1,end'); console.log('mousedown event') }, false);
-                rPump1.addEventListener('mouseup', function () { websocket.send('manual,stop,rPump1,end'); console.log('mouseup event'); }, false);
-                rPump1.addEventListener('touchstart', function () { websocket.send('manual,start,rPump1,end'); console.log('touchstart event'); }, false);
-                rPump1.addEventListener('touchend', function () { websocket.send('manual,stop,rPump1,end'); console.log('touchend event'); }, false);
-                rPump2.addEventListener('mousedown', function () { websocket.send('manual,start,rPump2,end'); console.log('mousedown event'); }, false);
-                rPump2.addEventListener('mouseup', function () { websocket.send('manual,stop,rPump2,end'); console.log('mouseup event') }, false);
-                rPump2.addEventListener('touchstart', function () { websocket.send('manual,start,rPump2,end'); console.log('touchstart event'); }, false);
-                rPump2.addEventListener('touchend', function () { websocket.send('manual,stop,rPump2,end'); console.log('touchend event'); }, false);
-                mCarHome.addEventListener('click', function () { websocket.send('manual,mCarHome,end') }, false);
-                sendCredentials.addEventListener('click', function () {
-                    const ssid = document.getElementById('ssid')
-                    const pass = document.getElementById('pass')
-                    websocket.send('net,' + ssid.value + ',' + pass.value + ',end');
-                }, false)
-                lButton.addEventListener('click', function () { websocket.send('lock,lock,end'), false });
-                uButton.addEventListener('click', function () { websocket.send('lock,unlock,end'), false })
-                ledButton.addEventListener('click', function () {
-                    const ledNum = document.getElementById('lNum');
-                    websocket.send('lnum', ledNum.value, + ',end');
-                }, false)
-                    
 
+                function sendMessage(type, payload) {
+                    const message = { type: type, payload: payload };
+                    websocket.send(JSON.stringify(message));
+                }
 
+                function initButton() {
+                    drink1Button.addEventListener('click', function () {
+                        sendMessage('pour', { drink: 'drink1', size: p1Range.value });
+                    }, false);
+
+                    drink2Button.addEventListener('click', function () {
+                        sendMessage('pour', { drink: 'drink2', size: p2Range.value });
+                    }, false);
+
+                    drink3Button.addEventListener('click', function () {
+                        sendMessage('pour', { drink: 'drink3', size1: p3Range1.value, size2: p3Range2.value });
+                    }, false);
+
+                    cancelButton.addEventListener('click', function () {
+                        sendMessage('pour', { drink: 'pourCancel' });
+                    }, false);
+
+                    rgbButton.addEventListener('click', function () {
+                        sendMessage('led', { value: getRgbVal() });
+                    }, false);
+
+                    brightSend.addEventListener('click', function () {
+                        sendMessage('brightness', { value: getBrightness() });
+                    }, false);
+
+                    mCarUp.addEventListener('mousedown', function () {
+                        sendMessage('manual', { action: 'mCarUp' });
+                        console.log('mousedown event');
+                    }, false);
+                    mCarUp.addEventListener('mouseup', function () {
+                        sendMessage('manual', { action: 'stop' });
+                        console.log('mouseup event');
+                    }, false);
+                    mCarUp.addEventListener('touchstart', function () {
+                        sendMessage('manual', { action: 'mCarUp' });
+                        console.log('touchstart event');
+                    }, false);
+                    mCarUp.addEventListener('touchend', function () {
+                        sendMessage('manual', { action: 'stop' });
+                        console.log('touchend event');
+                    }, false);
+
+                    mCarDown.addEventListener('mousedown', function () {
+                        sendMessage('manual', { action: 'mCarDown' });
+                        console.log('mousedown event');
+                    }, false);
+                    mCarDown.addEventListener('mouseup', function () {
+                        sendMessage('manual', { action: 'stop' });
+                        console.log('mouseup event');
+                    }, false);
+                    mCarDown.addEventListener('touchstart', function () {
+                        sendMessage('manual', { action: 'mCarDown' });
+                        console.log('touchstart event');
+                    }, false);
+                    mCarDown.addEventListener('touchend', function () {
+                        sendMessage('manual', { action: 'stop' });
+                        console.log('touchend event');
+                    }, false);
+
+                    rPump1.addEventListener('mousedown', function () {
+                        sendMessage('manual', { action: 'start', pump: 'rPump1' });
+                        console.log('mousedown event');
+                    }, false);
+                    rPump1.addEventListener('mouseup', function () {
+                        sendMessage('manual', { action: 'stop', pump: 'rPump1' });
+                        console.log('mouseup event');
+                    }, false);
+                    rPump1.addEventListener('touchstart', function () {
+                        sendMessage('manual', { action: 'start', pump: 'rPump1' });
+                        console.log('touchstart event');
+                    }, false);
+                    rPump1.addEventListener('touchend', function () {
+                        sendMessage('manual', { action: 'stop', pump: 'rPump1' });
+                        console.log('touchend event');
+                    }, false);
+
+                    rPump2.addEventListener('mousedown', function () {
+                        sendMessage('manual', { action: 'start', pump: 'rPump2' });
+                        console.log('mousedown event');
+                    }, false);
+                    rPump2.addEventListener('mouseup', function () {
+                        sendMessage('manual', { action: 'stop', pump: 'rPump2' });
+                        console.log('mouseup event');
+                    }, false);
+                    rPump2.addEventListener('touchstart', function () {
+                        sendMessage('manual', { action: 'start', pump: 'rPump2' });
+                        console.log('touchstart event');
+                    }, false);
+                    rPump2.addEventListener('touchend', function () {
+                        sendMessage('manual', { action: 'stop', pump: 'rPump2' });
+                        console.log('touchend event');
+                    }, false);
+
+                    mCarHome.addEventListener('click', function () {
+                        sendMessage('manual', { action: 'mCarHome' });
+                    }, false);
+
+                    sendCredentials.addEventListener('click', function () {
+                        const ssid = document.getElementById('ssid').value;
+                        const pass = document.getElementById('pass').value;
+                        sendMessage('net', { ssid: ssid, password: pass });
+                    }, false);
+
+                    lButton.addEventListener('click', function () {
+                        sendMessage('lock', { action: 'lock' });
+                    }, false);
+
+                    uButton.addEventListener('click', function () {
+                        sendMessage('lock', { action: 'unlock' });
+                    }, false);
+
+                    ledButton.addEventListener('click', function () {
+                        const ledNum = document.getElementById('lNum').value;
+                        sendMessage('lnum', { value: ledNum });
+                    }, false);
                 }
                 /*
                 function sendData(gateway, data) {

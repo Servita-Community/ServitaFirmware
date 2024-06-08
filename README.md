@@ -130,6 +130,7 @@ These files can then be referenced in the HTML, allowing for easier updates and 
 ```sh
 arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
+arduino-cli lib install "ArduinoJson@7.0.4"
 ```
 
 #### Cloning `ESPAsyncWebServer`

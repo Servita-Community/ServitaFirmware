@@ -7,6 +7,8 @@
 #include "inc/pour.h"
 #include "inc/motor.h"
 #include <Preferences.h>
+#include <ArduinoJson.h>
+
 
 uint32_t drink1_pour_size;
 uint32_t drink2_pour_size;
@@ -140,4 +142,48 @@ void abort_pour() {
     set_motor_state(&gantry, MOTOR_UP);
     drink_pour.state = IDLE;
     Serial.println("Pour aborted.");
+}
+
+bool validate_and_convert_size(const char* sizeStr, uint32_t& size) {
+    if (sizeStr == nullptr || !isDigit(sizeStr[0]) || atoi(sizeStr) == 0) {
+        Serial.println("Invalid pour size.");
+        return false;
+    }
+    size = atoi(sizeStr) * S_TO_MS;
+    return true;
+}
+
+void handle_pour_json(JsonObject payload) {
+    const char* drink = payload["drink"];
+    if (drink == nullptr) {
+        Serial.println("Missing drink field.");
+        return;
+    }
+
+    uint32_t size1, size2;
+    bool drink1 = strcmp(drink, "drink1") == 0;
+    bool drink2 = strcmp(drink, "drink2") == 0;
+
+    if (drink1 || drink2) {
+        const char* sizeStr = payload["size"];
+        if (!validate_and_convert_size(sizeStr, size1)) return;
+
+        Serial.printf("Setting pour size for %s to: %u ms\n", drink, size1);
+        set_pour_size(drink1 ? DRINK1_POUR_SIZE : DRINK2_POUR_SIZE, size1);
+        start_pour(drink1 ? DRINK1 : DRINK2);
+    } else if (strcmp(drink, "drink3") == 0) {
+        const char* size1Str = payload["size1"];
+        const char* size2Str = payload["size2"];
+        if (!validate_and_convert_size(size1Str, size1) || !validate_and_convert_size(size2Str, size2)) return;
+
+        Serial.printf("Setting pour sizes for mixed drink to: %u ms and %u ms\n", size1, size2);
+        set_pour_size(MIXED_POUR_1_SIZE, size1);
+        set_pour_size(MIXED_POUR_2_SIZE, size2);
+        start_pour(MIXED);
+    } else if (strcmp(drink, "pourCancel") == 0) {
+        Serial.println("Aborting pour.");
+        abort_pour();
+    } else {
+        Serial.println("Unknown drink type.");
+    }
 }

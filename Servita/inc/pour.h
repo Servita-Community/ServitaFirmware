@@ -9,6 +9,9 @@
 #define POUR_H
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
+
+#define S_TO_MS 1000
 
 enum pour_states_t {
     IDLE,
@@ -73,5 +76,15 @@ void pour_seq_loop();
  * @brief Abort the pour sequence.
 */
 void abort_pour();
+
+/**
+ * @brief validate pour size and conver to ms from s
+*/
+void validate_and_convert_size(const char* size, uint32_t* pour_size);
+
+/**
+ * @brief Handle a websocket pour json message.
+*/
+void handle_pour_json(JsonObject payload);
 
 #endif // POUR_H
