@@ -1,6 +1,4 @@
 #include <FastLED.h>
-#include <esp_system.h>
-#include <esp_log.h>
 
 #include "inc/button.h"
 #include "inc/motor.h"
@@ -24,12 +22,6 @@ const int ledMin = 75;
 int fadeFlag = 0;
 CRGB leds[NUM_LEDS];
 
-// Custom panic handler
-void custom_panic_handler(void) {
-  ESP_LOGE("PANIC", "A panic occurred, restarting now...");
-  ESP.restart();
-}
-
 void setup() {
   Serial.begin(115200);
 
@@ -42,8 +34,6 @@ void setup() {
   init_serial_commands();
   init_buttons();
   init_server();
-
-  esp_register_fatal_exception_handler(custom_panic_handler);
 
   Serial.println("Setup complete");
 }
