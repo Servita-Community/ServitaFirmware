@@ -121,12 +121,6 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
     }
 }
 
-void setup_server_http() {
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send_P(200, "text/html", main_html);
-    });
-}
-
 void init_server() {
     bool run_locally = true;
     String ssid, pass;
@@ -146,7 +140,9 @@ void init_server() {
         Serial.println("Local DNS server started...");
     }
 
-    setup_server_http();
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send_P(200, "text/html", main_html);
+    });
     ws.onEvent(on_ws_event);
     server.addHandler(&ws);
     server.begin();

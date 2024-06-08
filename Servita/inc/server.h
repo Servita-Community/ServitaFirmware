@@ -16,7 +16,6 @@ void delete_credentials();
 void get_credentials(String *ssid, String *pass);
 void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 bool connect_to_wifi(const char *ssid, const char *pass);
-void setup_server_http();
 void init_server();
 void server_loop();
 
