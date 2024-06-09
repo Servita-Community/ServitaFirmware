@@ -9,6 +9,7 @@
 #include "inc/main_html.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
+#include "inc/led.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -104,17 +105,13 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             if (strcmp(type, "pour") == 0) {
                 handle_pour_json(payload);
             } else if (strcmp(type, "led") == 0) {
-                // handleLED(payload);
-            } else if (strcmp(type, "brightness") == 0) {
-                // handleBrightness(payload);
+                handle_led_json(payload);
             } else if (strcmp(type, "manual") == 0) {
                 handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
                 handle_net_json(client, payload);
             } else if (strcmp(type, "lock") == 0) {
                 handle_lock_json(payload);
-            } else if (strcmp(type, "lnum") == 0) {
-                // handleLNum(payload);
             } else {
                 Serial.println("Unknown message type");
             }

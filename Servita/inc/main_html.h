@@ -905,11 +905,11 @@ const char main_html[] PROGMEM = R"rawliteral(
                     }, false);
 
                     rgbButton.addEventListener('click', function () {
-                        sendMessage('led', { value: getRgbVal() });
+                        sendMessage('led', { red: red.value, green: green.value, blue: blue.value});
                     }, false);
 
                     brightSend.addEventListener('click', function () {
-                        sendMessage('brightness', { value: getBrightness() });
+                        sendMessage('led', { brightness: getBrightness() });
                     }, false);
 
                     mCarUp.addEventListener('mousedown', function () {
@@ -1000,7 +1000,7 @@ const char main_html[] PROGMEM = R"rawliteral(
 
                     ledButton.addEventListener('click', function () {
                         const ledNum = document.getElementById('lNum').value;
-                        sendMessage('lnum', { value: ledNum });
+                        sendMessage('led', { length: ledNum });
                     }, false);
                 }
                 /*
