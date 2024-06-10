@@ -10,17 +10,15 @@
 
 void setup() {
   Serial.begin(115200);
-
   delay(100);
 
-  // Iniitialize systems
+  init_leds();
   init_limit_switches();
   init_motors();
   init_pour_system();
   init_serial_commands();
   init_buttons();
   init_server();
-  init_leds();
 
   Serial.println("Setup complete");
 }

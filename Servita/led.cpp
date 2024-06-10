@@ -14,7 +14,6 @@ uint16_t strip_length;
 uint8_t led_brightness;
 
 CRGB board_led;
-BoardLEDState board_state = NO_CONNECTION;
 
 Preferences led_preferences;
 
@@ -25,7 +24,7 @@ void init_leds() {
     strip_color.g = led_preferences.getUInt("green", 0);
     strip_color.b = led_preferences.getUInt("blue", 0);
     strip_length = led_preferences.getUInt("length", DEFAULT_STRIP_LED_LENGTH);
-    led_brightness = led_preferences.getUInt("brightness", DEFAULT_STRIP_LED_BRIGHTNESS);
+    led_brightness = led_preferences.getUInt("brightness", DEFAULT_BRIGHTNESS);
     led_preferences.end();
 
     Serial.printf("LED strip color preferences (R,G,B): (%u, %u, %u)\n", strip_color.r, strip_color.g, strip_color.b);
@@ -36,7 +35,7 @@ void init_leds() {
     FastLED.addLeds<SK6812, BOARD_LED_DATA_PIN, GRB>(&board_led, 1);
 
     fill_solid(strip_leds, strip_length, strip_color);
-    board_led = NO_CONNECTION_COLOR;
+    board_led = INITIAL_BOOT_COLOR;
     FastLED.show(led_brightness);
 
     Serial.println("LEDs initialized");
@@ -78,6 +77,11 @@ void set_led_strip_brightness(uint8_t brightness) {
     led_preferences.begin("led", false);
     led_preferences.putUInt("brightness", led_brightness);
     led_preferences.end();
+}
+
+void set_board_led(CRGB color) {
+    board_led = color;
+    FastLED.show(led_brightness);
 }
 
 void handle_led_json(JsonObject payload) {

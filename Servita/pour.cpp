@@ -6,6 +6,8 @@
 */
 #include "inc/pour.h"
 #include "inc/motor.h"
+#include "inc/led.h"
+#include "inc/server.h"
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
@@ -72,6 +74,10 @@ void start_pour(drink_t drink) {
 
     drink_pour.drink = drink;
     set_motor_state(&gantry, MOTOR_DOWN);
+    set_board_led(
+        drink == DRINK1 ? POUR_DRINK_1_COLOR : 
+        drink == DRINK2 ? POUR_DRINK_2_COLOR : POUR_DRINK_MIXED_COLOR
+    );
     drink_pour.state = GANTRY_DECENDING;
     Serial.printf("Starting pour for drink: %d\n", drink);
 }
@@ -129,6 +135,7 @@ void pour_seq_loop() {
         case GANTRY_ASCENDING:
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
                 drink_pour.state = IDLE;
+                set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
                 Serial.println("Gantry up all done switching to idle.");
             } else {
                 set_motor_state(&gantry, MOTOR_UP);

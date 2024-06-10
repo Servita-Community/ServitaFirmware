@@ -8,6 +8,7 @@
 #include "inc/button.h"
 #include "inc/pour.h"
 #include "inc/motor.h"
+#include "inc/led.h"
 
 volatile bool button1_pressed = false;
 volatile bool button2_pressed = false;
@@ -35,6 +36,7 @@ void button_loop() {
             start_pour(DRINK1);
         } else if (drink_pour.state == GANTRY_DECENDING && drink_pour.drink == DRINK2) {
             drink_pour.drink = MIXED;
+            set_board_led(POUR_DRINK_MIXED_COLOR);
         }
     }
 
@@ -44,6 +46,7 @@ void button_loop() {
             start_pour(DRINK2);
         } else if (drink_pour.state == GANTRY_DECENDING && drink_pour.drink == DRINK1) {
             drink_pour.drink = MIXED;
+            set_board_led(POUR_DRINK_MIXED_COLOR);
         }
     }
 }
