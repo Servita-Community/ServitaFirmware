@@ -156,6 +156,7 @@ void abort_pour() {
     set_motor_state(&pump2, MOTOR_OFF);
     set_motor_state(&gantry, MOTOR_UP);
     drink_pour.state = IDLE;
+    set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
     Serial.println("Pour aborted.");
 }
 
