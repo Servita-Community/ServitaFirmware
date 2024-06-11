@@ -8,6 +8,7 @@
 #include "inc/motor.h"
 #include "inc/led.h"
 #include "inc/server.h"
+#include "inc/button.h"
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
@@ -89,6 +90,13 @@ void pour_seq_loop() {
         case GANTRY_DECENDING:
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW) {
                 drink_pour.pour_start_time = (uint64_t) millis();
+
+                if (is_button_pressed(BUTTON1) || is_button_pressed(BUTTON2)) {
+                    Serial.println("Button based pour cancel detected. Aborting pour...");
+                    abort_pour();
+                    break;
+                }
+
                 if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
                 if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
                 drink_pour.state = POURING;
@@ -155,7 +163,7 @@ void abort_pour() {
     set_motor_state(&pump1, MOTOR_OFF);
     set_motor_state(&pump2, MOTOR_OFF);
     set_motor_state(&gantry, MOTOR_UP);
-    drink_pour.state = IDLE;
+    drink_pour.state = GANTRY_ASCENDING;
     set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
     Serial.println("Pour aborted.");
 }
