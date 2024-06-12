@@ -15,7 +15,7 @@
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
-
+// String get_pour_size();
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 Preferences wifi_preferences;
@@ -115,7 +115,15 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                 handle_lock_json(payload);
             } else if (strcmp(type, "lnum") == 0) {
                 // handleLNum(payload);
-            } else {
+            } else if (strcmp(type, "getPourSize") == 0) {
+                String pourSizes = get_pour_size();
+                client->text(pourSizes);
+            } else if (strcmp(type, "changePourSize") == 0) {
+                set_pour_size(payload["drink"], payload["size"]);
+                String pourSizes = get_pour_size();
+                client->text(pourSizes);
+            }
+            else {
                 Serial.println("Unknown message type");
             }
         }

@@ -32,6 +32,20 @@ void init_pour_system() {
     drink_pour.pour_start_time = 0;
 }
 
+
+
+String get_pour_size() {
+    StaticJsonDocument<256> payload;
+    payload["type"] = "pourSize";
+    payload["p1"] = String(drink1_pour_size);
+    payload["p2"] = String(drink2_pour_size);
+    payload["mixed1"] = String(mixed1_pour_size);
+    payload["mixed2"] = String(mixed2_pour_size);
+    String jsonString;
+    serializeJson(payload, jsonString);
+    return jsonString;
+}
+
 void set_pour_size(pour_size_setting_t setting, uint32_t pour_size) {
     bool opened = pour_preferences.begin("pour", false);
     switch (setting) {

@@ -851,35 +851,75 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const mCarHome = document.getElementById('mCarHome');
                 const rPump1 = document.getElementById('rPump1');
                 const rPump2 = document.getElementById('rPump2');
-
-              
                 var websocket;
-
+                let appData;
 
                 function initWebSocket() {
+                    function updateAppDataObject(type, receivedData) {
+                        function buildAppDataObject(receivedData) { 
+                            console.log('Building appData object:', receivedData);
+                            //build the app data object
+                            appData = {
+                                timestamp: Date.now(),
+                                liveConnection: true,
+                                pourSize: {
+                                    p1: receivedData.p1,
+                                    p2: receivedData.p2,
+                                    m1: receivedData.mixed1,
+                                    m2: receivedData.mixed2
+                                }
+                            }
+                            return appData;
+                        } 
+                        try {
+                            if (appData === undefined || appData === null) {
+                                buildAppDataObject(receivedData);
+                                ensureSliderIsAccurate();
+                            } else if (type == 'pourSize') {
+                                appData.timestamp = Date.now();
+                                appData.pourSize.p1 = receivedData.p1;
+                                appData.pourSize.p2 = receivedData.p2;
+                                appData.pourSize.m1 = receivedData.m2;
+                                appData.pourSize.m2 = receivedData.m2;
+                            } else {
+                                return console.log('Unknown type:', type);
+                            }
+                        }
+                        catch (error) {
+                            console.log('Error updating appData object:', error);
+                            //Window.alert('Error updating appData object. Frontend may not work as expected.');
+
+                        }
+                    }
                         console.log('Trying to open a WebSocket connection...');
                         websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
                         websocket.onopen = onOpen;
                         websocket.onclose = onClose;
-                        // websocket.onmessage = onMessage; // <-- add this line
+                        websocket.onmessage = onMessage;
                     function onOpen(event) {
                         console.log('Connection opened');
                         initButton();
+                        sendMessage('getPourSize', { payload: 'init' });
                     }
-                    
                     function onClose(event) {
                         console.log('Connection closed');
+                        appData.liveConnection = false;
+                    }
+                    // message handler function
+                    function onMessage(event) {
+                        console.log('Message received:', event.data);
+                        const message = JSON.parse(event.data);
+                        console.log('Message received:', message);
+                        updateAppDataObject(message.type, message);
                     }
                 }
-                
 
-                function sendData(data) {
-                    
-                }
+                
                     
                 window.addEventListener('load', onLoad, false);
                 function onLoad(event) {
-                    initSliders(); 
+                    initSliders();
+
                 }
 
                 function sendMessage(type, payload) {
@@ -1015,22 +1055,47 @@ const char main_html[] PROGMEM = R"rawliteral(
                     }
                 }
                 function initSliders() {
+
                     displaySliderVals();
                     setColor();
                     p3Range1.oninput = function () {
                         displaySliderVals();
                         p3ValueSafety(p3Range2, p3Range1);
                     }
+                    p3Range1.ontouchend = function () {
+                        sendMessage('changePourSize', { drink: 'MIXED_POUR_1_SIZE', size: p3Range1.value });
+                    }
+                    p3Range1.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: 'MIXED_POUR_1_SIZE', size: p3Range1.value });
+                    }
                     p3Range2.oninput = function () {
                         displaySliderVals();
                         p3ValueSafety(p3Range1, p3Range2);
                     }
+                    p3Range2.ontouchend = function () {
+                        sendMessage('changePourSize', { drink: 'MIXED_POUR_2_SIZE', size: p3Range2.value });
+                    }
+                    p3Range2.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: 'MIXED_POUR_2_SIZE', size: p3Range2.value });
+                    }
                     p1Range.oninput = function () {
                         displaySliderVals();
                     }
+                    p1Range.ontouchend = function () {
+                        sendMessage('changePourSizee', { drink: 'DRINK1_POUR_SIZE', size: p1Range.value });
+                    }
+                    p1Range.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: 'DRINK1_POUR_SIZE', size: p1Range.value });
+                    }
                     p2Range.oninput = function () {
                         setColor();
-                        displaySliderVals()
+                        displaySliderVals();
+                    }
+                    p2Range.ontouchend = function () {
+                        sendMessage('changePourSize', { drink: 'DRINK2_POUR_SIZE', size: p2Range.value });   
+                    }
+                    p2Range.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: 'DRINK2_POUR_SIZE', size: p2Range.value });   
                     }
                     brightness.oninput = function () {
                         setColor();
@@ -1049,6 +1114,13 @@ const char main_html[] PROGMEM = R"rawliteral(
                         displaySliderVals();
                     }
                 }
+                function ensureSliderIsAccurate() {
+                    p1Range.value = appData.pourSize.p1;
+                    p2Range.value = appData.pourSize.p2;
+                    p3Range1.value = appData.pourSize.m1;
+                    p3Range2.value = appData.pourSize.m2;
+                    displaySliderVals(); 
+                }
                 function displaySliderVals() {
                     p1ValDisplay.innerHTML = "Pour Size: " + p1Range.value;
                     p2ValDisplay.innerHTML = "Pour Size: " + p2Range.value;
@@ -1058,8 +1130,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                     rDisplay.innerHTML = "Red Value: " + red.value;
                     gDisplay.innerHTML = "Green Value: " + green.value;
                     bDisplay.innerHTML = "Blue Value: " + blue.value;
-                }
-                function sendPourSizeVals() {
                 }
                 function setColor() {
                     display.style.backgroundColor = `rgb(${red.value}, ${green.value}, ${blue.value})`;
