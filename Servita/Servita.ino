@@ -28,4 +28,5 @@ void loop() {
   pour_seq_loop();
   button_loop();
   server_loop();
+  motor_loop();
 }

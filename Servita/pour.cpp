@@ -162,9 +162,16 @@ void abort_pour() {
 
     set_motor_state(&pump1, MOTOR_OFF);
     set_motor_state(&pump2, MOTOR_OFF);
-    set_motor_state(&gantry, MOTOR_UP);
-    drink_pour.state = GANTRY_ASCENDING;
-    set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+
+    if (!lockout) {
+        set_motor_state(&gantry, MOTOR_UP);
+        drink_pour.state = GANTRY_ASCENDING;
+        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+    } else {
+        Serial.println("Motor lockout in effect, will not raise gantry.");
+        drink_pour.state = IDLE;
+    }
+
     Serial.println("Pour aborted.");
 }
 
@@ -217,7 +224,9 @@ void handle_lock_json(JsonObject payload) {
     if (strcmp(action, "lock") == 0) {
         abort_pour();
         lockout = true;
+        set_board_led(LOCKOUT_COLOR);
     } else if (strcmp(action, "unlock") == 0) {
         lockout = false;
+        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
     }
 }
