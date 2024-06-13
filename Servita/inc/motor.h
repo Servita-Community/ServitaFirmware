@@ -26,6 +26,9 @@
 #define LIMIT_SWITCH_TOP 34
 #define LIMIT_SWITCH_BOTTOM 35
 
+#define GANTRY_END_CHECK_TIME 200
+#define LIMIT_SWITCH_SETTLE_TIME 10
+
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \
     (type == PUMP2) ? "PUMP2" : \
@@ -61,6 +64,7 @@ typedef struct {
 extern motor_t pump1;
 extern motor_t pump2;
 extern motor_t gantry;
+extern bool hardware_error;
 
 
 /**
