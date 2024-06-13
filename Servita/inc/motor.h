@@ -28,6 +28,7 @@
 
 #define GANTRY_TIMEOUT 15000
 #define MOTOR_BACKOFF_TIME 200
+#define LIMIT_SWITCH_DEBOUNCE 20
 
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \

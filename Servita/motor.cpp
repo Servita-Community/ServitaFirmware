@@ -37,7 +37,9 @@ void init_motors() {
     init_motor(&pump2);
     init_motor(&gantry);
 
-    if (digitalRead(LIMIT_SWITCH_TOP) == HIGH)      set_motor_state(&gantry, MOTOR_UP);
+    set_motor_state(&gantry, MOTOR_UP);
+    delay(LIMIT_SWITCH_DEBOUNCE);
+    set_motor_state(&gantry, MOTOR_UP);
 }
 
 bool set_motor_state(motor_t *motor, motor_state_t state) {
