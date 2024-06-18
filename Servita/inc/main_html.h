@@ -706,7 +706,7 @@ const char main_html[] PROGMEM = R"rawliteral(
             </div>
             <div class="settingsPage">
                 <div id="lockUnlockContainer" class="settingsContainer">
-                    <h3>Lock/Unlock Device</h3>
+                    <h2>Lock/Unlock Device</h2>
                     <div class="settingsItems">
                         <div id="luButtonContainer" class="settingsSubItemsRow">
                             <div class="settingsStatusContainer">
@@ -726,7 +726,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                 </div>
                 <div id="wifiControlsContainer" class="settingsContainer">
                     <div class="settingsSubTitle">
-                        <h3>Change WiFi Credentials</h2>
+                        <h2>Change WiFi Credentials</h2>
                     </div>
                     <div id="inputForm" class="settingsItems">
                         <div id="sContain">
@@ -744,9 +744,9 @@ const char main_html[] PROGMEM = R"rawliteral(
                 </div>
                 <div id="numLEDContainer" class="settingsContainer">
                     <div class="settingsSubTitle">
-                        <h3>
+                        <h2>
                             Number Of LEDs
-                        </h3>
+                        </h2>
                     </div>
                     <div id="inputForm" class="settingsItems">
                         <div>
