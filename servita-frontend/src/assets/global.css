@@ -1,0 +1,147 @@
+body {
+  background-color: #c9c7c7;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+}
+
+h1 {
+  text-align: left;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+}
+
+.appPage {
+  height: fit-content;
+  width: 100vw;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  transition-duration: 300ms;
+  flex-grow: 1;
+}
+
+.controlsButtons {
+  font-size: 1rem;
+  font-family: Arial;
+  height: 3rem;
+  width: 100%;
+  border-width: 1px;
+  color: #fff;
+  border-color: #4682B4;
+  font-weight: bold;
+  border-radius: 0.5rem;
+  box-shadow: 0px 10px 14px -7px #276873;
+  text-shadow: 0px 1px 0px #3d768a;
+  background: rgba(74, 74, 74, 1);
+  background-position: center;
+  transition: background 0.8s;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1rem;
+  border-radius: 0.3rem;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #4682B4;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #4682B4;
+  cursor: pointer;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1;
+}
+
+/* Media queries for responsiveness */
+@media (min-width: 320px) {
+  .controlsButtons {
+    font-size: 0.8rem;
+    height: 2.5rem;
+    width: 80%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .controlsButtons {
+    font-size: 1rem;
+    height: 3rem;
+    width: 100%;
+  }
+}
+
+/* Hover and focus effects */
+@media (hover: hover) {
+  .controlsButtons:hover,
+  .controlsButtons:focus {
+    background: #4682B4 radial-gradient(circle, transparent 1%, #303030 1%) center/15000% !important;
+  }
+
+  .controlsButtons:active {
+    background-color: #4682B4;
+    background-size: 100%;
+    transition: background 0s;
+  }
+
+  #cancel:hover,
+  #cancel:focus {
+    background: #701313 radial-gradient(circle, transparent 1%, #701313 1%) center/15000% !important;
+  }
+
+  #cancel:active {
+    background-color: #701313;
+    background-size: 100%;
+    transition: background 0s;
+  }
+}
+
+@media (hover: none) {
+  .controlsButtons:focus {
+    background: #4682B4 radial-gradient(circle, transparent 1%, #303030 1%) center/15000% !important;
+  }
+
+  .controlsButtons:active {
+    background-color: #4682B4;
+    background-size: 100%;
+    transition: background 0.1s;
+  }
+
+  #cancel:focus {
+    background: #701313 radial-gradient(circle, transparent 1%, #701313 1%) center/15000% !important;
+  }
+
+  #cancel:active {
+    background-color: #701313;
+    background-size: 100%;
+    transition: background 0.1s;
+  }
+}
