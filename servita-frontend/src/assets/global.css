@@ -35,13 +35,9 @@ h2 {
   font-family: Arial;
   height: 3rem;
   width: 100%;
-  border-width: 1px;
   color: #fff;
-  border-color: #4682B4;
   font-weight: bold;
   border-radius: 0.5rem;
-  box-shadow: 0px 10px 14px -7px #276873;
-  text-shadow: 0px 1px 0px #3d768a;
   background: rgba(74, 74, 74, 1);
   background-position: center;
   transition: background 0.8s;

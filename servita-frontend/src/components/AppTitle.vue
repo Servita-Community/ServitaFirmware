@@ -16,21 +16,15 @@ export default {
 #appTitle {
   display: flex;
   width: 100%;
-  height: 80px;
-  flex-direction: row;
-  background-color: black;
-  color: white;
+  height: 6%;
+  background-color: #0C0C0C;
   justify-content: center;
   align-items: center;
   position: fixed;
-  top: 0;
-  z-index: 1000;
 }
 
 #imgContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100%; /* Ensure it takes the height of the parent */
 }
 
@@ -39,14 +33,4 @@ export default {
   max-height: 100%; /* Constrain height to parent */
 }
 
-@media (min-width: 320px) {
-  #appTitle {
-    height: 60px;
-  }
-
-  #logo {
-    max-width: 200px;
-    max-height: 40px;
-  }
-}
 </style>

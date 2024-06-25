@@ -31,8 +31,9 @@ export default {
 <style scoped>
 #appMenu {
   position: fixed;
-  bottom: 10px;
+  bottom: 0.5%;
   width: 100%;
+  height: 10%;
   display: flex;
   justify-content: center;
 }
@@ -49,7 +50,6 @@ export default {
   height: fit-content; /* Automatically size to minimum required height */
   justify-self: center;
   align-self: center;
-  box-shadow: 0px 10px 14px -7px gray;
   border-radius: 1rem; /* More rounded corners */
 }
 
@@ -65,7 +65,7 @@ export default {
   background: black;
   border-radius: 1rem; /* More rounded corners */
   height: 2.5rem; /* Smaller fixed height */
-  width: 6rem; /* Smaller fixed width */
+  width: 5rem; /* Smaller fixed width */
   border: none; /* Simplified border style */
   color: white;
   font-weight: bold; /* Bold the letters */

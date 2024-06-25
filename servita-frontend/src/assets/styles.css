@@ -1,0 +1,11 @@
+:root {
+    --header-footer-color: #0C0C0C;
+    --header-footer-text-color: #FFFFFF;
+    --light-mode-background-color: #c9c9c9;
+    --light-mode-container-color: #B2B2B2;
+    --dark-mode-background-color: #1C1C1C;
+    --dark-mode-container-color: #2C2C2C;
+    --secondary-color: #2ecc71;
+    --background-color: #f5f5f5;
+    --text-color: #333333;
+}

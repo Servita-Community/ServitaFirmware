@@ -1,14 +1,16 @@
 <template>
-  <div id="app">
-    <AppTitle />
-    <div id="appView" class="appView">
-      <PourControls v-show="currentView === 'pour'" />
-      <RGBPicker v-show="currentView === 'rgb'" />
-      <DeviceSettings v-show="currentView === 'settings'" />
-      <ManualControls v-show="currentView === 'manual'" />
+  <v-app>
+    <div id="app">
+      <AppTitle />
+      <div id="appView" class="appView">
+        <PourControls v-show="currentView === 'pour'" />
+        <RGBPicker v-show="currentView === 'rgb'" />
+        <DeviceSettings v-show="currentView === 'settings'" />
+        <ManualControls v-show="currentView === 'manual'" />
+      </div>
+      <AppMenu @change-view="changeView" />
     </div>
-    <AppMenu @change-view="changeView" />
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -66,8 +68,7 @@ h2 {
   display: flex;
   height: 90%;
   width: 100vw;
-  margin-top: 100px;
-  margin-bottom: auto;
+  margin-top: 8%;
   position: fixed;
 }
 .break {
