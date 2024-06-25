@@ -54,23 +54,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   display: flex;
   flex-direction: column;
-  align-content: center;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
 }
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
 h1 {
   text-align: left;
   color: white;
 }
+
 h2 {
   text-align: center;
 }
+
 .appView {
   display: flex;
-  height: 90%;
+  flex-direction: column;
   width: 100vw;
-  margin-top: 8%;
-  position: fixed;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-bottom: 10%; /* Account for the height of the bottom bar */
 }
+
 .break {
   width: 100% !important;
   height: 0;
