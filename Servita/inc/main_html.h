@@ -1098,6 +1098,8 @@ const char main_html[] PROGMEM = R"rawliteral(
                 function p3ValueSafety(pToAdj, pUserAdj) {
                     const sum = parseInt(pUserAdj.value) + parseInt(pToAdj.value);
                     if (sum > 20) {
+                        pToAdj.classList.add('thumb-blue');
+                        pToAdj.classList.remove('thumb-green');
                         pToAdj.value = 20 - pUserAdj.value;
                     }
                 }
@@ -1108,26 +1110,34 @@ const char main_html[] PROGMEM = R"rawliteral(
                     p3Range1.oninput = function () {
                         p3Range1.classList.add('thumb-blue');
                         p3Range1.classList.remove('thumb-green');
-                        displaySliderVals();
                         p3ValueSafety(p3Range2, p3Range1);
+                        displaySliderVals();
                     }
                     p3Range1.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: "drink3_size1", size: p3Range1.value });
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p3Range1.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: "drink3_size1", size: p3Range1.value });
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p3Range2.oninput = function () {
                         p3Range2.classList.add('thumb-blue');
                         p3Range2.classList.remove('thumb-green');
-                        displaySliderVals();
                         p3ValueSafety(p3Range1, p3Range2);
+                        displaySliderVals();
                     }
                     p3Range2.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: "drink3_size2", size: p3Range2.value });
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p3Range2.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: "drink3_size2", size: p3Range2.value });
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p1Range.oninput = function () {
                         p1Range.classList.add('thumb-blue');

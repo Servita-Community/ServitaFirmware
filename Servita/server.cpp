@@ -123,18 +123,25 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                     return;
                 }
 
-                const char* sizeStr = payload["size"];
-                uint32_t size;
-                if (!validate_and_convert_size(sizeStr, size)) return;
-
                 if (strcmp(drink, "drink1") == 0) {
+                    const char* sizeStr = payload["size"];
+                    uint32_t size;
+                    if (!validate_and_convert_size(sizeStr, size)) return;
                     set_pour_size(DRINK1_POUR_SIZE, size);
                 } else if (strcmp(drink, "drink2") == 0) {
+                    const char* sizeStr = payload["size"];
+                    uint32_t size;
+                    if (!validate_and_convert_size(sizeStr, size)) return;
                     set_pour_size(DRINK2_POUR_SIZE, size);
-                } else if (strcmp(drink, "drink3_size1") == 0) {
-                    set_pour_size(MIXED_POUR_1_SIZE, size);
-                } else if (strcmp(drink, "drink3_size2") == 0) {
-                    set_pour_size(MIXED_POUR_2_SIZE, size);
+                } else if (strcmp(drink, "drink3") == 0) {
+                    uint32_t size1, size2;
+                    const char* sizeStr1 = payload["size1"];
+                    const char* sizeStr2 = payload["size2"];
+                    if (!validate_and_convert_size(sizeStr1, size1)) return;
+                    if (!validate_and_convert_size(sizeStr2, size2)) return;
+
+                    set_pour_size(MIXED_POUR_1_SIZE, size1);
+                    set_pour_size(MIXED_POUR_2_SIZE, size2);
                 } else {
                     Serial.println("Unknown drink type.");
                 }   
