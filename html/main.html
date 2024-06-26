@@ -741,20 +741,20 @@
                 <div id="rgbSliders" class="settingsItems">
                     <div class="settingsSubItemsCol">
                         <label id="rLabel" for="red">Red</label>
-                        <input type="range" class="slider" id="red" name="red" min="0" max="255" value="0">
+                        <input type="range" class="thumb-blue" id="red" name="red" min="0" max="255" value="">
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="gLabel" for="green">Green</label>
-                        <input type="range" class="slider" id="green" name="green" min="0" max="255" value="0">
+                        <input type="range" class="thumb-blue" id="green" name="green" min="0" max="255" value="">
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="bLabel" for="blue">Blue</label>
-                        <input type="range" class="slider" id="blue" name="blue" min="0" max="255" value="0">
+                        <input type="range" class="thumb-blue" id="blue" name="blue" min="0" max="255" value="">
                         <button type="button" class="controlsButtons" id="rgbSend" onclick="getRgbVal()">Confirm Color</button>
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="brightValDisplay" name="brightness">Brightness Level:</label>
-                        <input name="brightness" type="range" min="0" max="255" value="127" class="slider"
+                        <input name="brightness" type="range" min="0" max="255" value="" class="thumb-blue"
                             id="brightness">
                         <button type="button" class="controlsButtons" id="brightSend" onclick="getBrightness()">Confirm
                             Brightness</button>
@@ -924,6 +924,7 @@
                     console.log('Connection opened');
                     initButton();
                     sendMessage('getPourSize', { payload: 'init' });
+                    sendMessage('led', { payload: "get" });
                 }
 
                 function onClose(event) {
@@ -951,6 +952,24 @@
                         p3Range2.classList.add('thumb-green');
                     } else if (message.type == 'ledSettings') {
                         console.log('LED settings message received');
+                        red.value = message.red;
+                        green.value = message.green;
+                        blue.value = message.blue;
+                        brightness.value = message.brightness;
+                        document.getElementById('lNum').value = message.length;
+                        brightValDisplay.innerHTML = "Brightness Level: " + brightness.value;
+                        rDisplay.innerHTML = "Red Value: " + red.value;
+                        gDisplay.innerHTML = "Green Value: " + green.value;
+                        bDisplay.innerHTML = "Blue Value: " + blue.value;
+                        red.classList.add('thumb-green');
+                        red.classList.remove('thumb-blue');
+                        green.classList.add('thumb-green');
+                        green.classList.remove('thumb-blue');
+                        blue.classList.add('thumb-green');
+                        blue.classList.remove('thumb-blue');
+                        brightness.classList.add('thumb-green');
+                        brightness.classList.remove('thumb-blue');
+                        setColor();
                     }
                 }
 
@@ -1161,18 +1180,26 @@
                         sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
                     }
                     brightness.oninput = function () {
+                        brightness.classList.add('thumb-blue');
+                        brightness.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals()
                     }
                     red.oninput = function () {
+                        red.classList.add('thumb-blue');
+                        red.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
                     }
                     green.oninput = function () {
+                        green.classList.add('thumb-blue');
+                        green.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
                     }
                     blue.oninput = function () {
+                        blue.classList.add('thumb-blue');
+                        blue.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
                     }

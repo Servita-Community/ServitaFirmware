@@ -31,5 +31,6 @@ void set_led_strip_color(CRGB color);
 void set_led_strip_brightness(uint8_t brightness);
 void set_board_led(CRGB color);
 void handle_led_json(JsonObject payload);
+String get_led_status();
 
 #endif // LED_H

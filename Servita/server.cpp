@@ -107,6 +107,8 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                 handle_pour_json(payload);
             } else if (strcmp(type, "led") == 0) {
                 handle_led_json(payload);
+                String ledStatus = get_led_status();
+                client->text(ledStatus);
             } else if (strcmp(type, "manual") == 0) {
                 handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
