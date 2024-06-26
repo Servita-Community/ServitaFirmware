@@ -750,14 +750,10 @@
                     <div class="settingsSubItemsCol">
                         <label id="bLabel" for="blue">Blue</label>
                         <input type="range" class="thumb-blue" id="blue" name="blue" min="0" max="255" value="">
-                        <button type="button" class="controlsButtons" id="rgbSend" onclick="getRgbVal()">Confirm Color</button>
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="brightValDisplay" name="brightness">Brightness Level:</label>
-                        <input name="brightness" type="range" min="0" max="255" value="" class="thumb-blue"
-                            id="brightness">
-                        <button type="button" class="controlsButtons" id="brightSend" onclick="getBrightness()">Confirm
-                            Brightness</button>
+                        <input name="brightness" type="range" min="0" max="255" value="" class="thumb-blue" id="brightness">
                     </div>
 
                 </div>
@@ -901,8 +897,6 @@
                 const green = document.getElementById('green');
                 const blue = document.getElementById('blue');
                 const display = document.getElementById('display');
-                const brightSend = document.getElementById('brightSend');
-                const rgbButton = document.getElementById('rgbSend')
                 const rDisplay = document.getElementById('rLabel')
                 const bDisplay = document.getElementById('bLabel')
                 const gDisplay = document.getElementById('gLabel');
@@ -1007,14 +1001,6 @@
 
                     cancelButton.addEventListener('click', function () {
                         sendMessage('pour', { drink: 'pourCancel' });
-                    }, false);
-
-                    rgbButton.addEventListener('click', function () {
-                        sendMessage('led', { red: red.value, green: green.value, blue: blue.value});
-                    }, false);
-
-                    brightSend.addEventListener('click', function () {
-                        sendMessage('led', { brightness: getBrightness() });
                     }, false);
 
                     mCarUp.addEventListener('mousedown', function () {
@@ -1185,11 +1171,23 @@
                         setColor();
                         displaySliderVals()
                     }
+                    brightness.ontouchend = function () {
+                        sendMessage('led', { brightness: getBrightness() });
+                    }
+                    brightness.onmouseup = function () {
+                        sendMessage('led', { brightness: getBrightness() });
+                    }
                     red.oninput = function () {
                         red.classList.add('thumb-blue');
                         red.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
+                    }
+                    red.ontouchend = function () {
+                        sendMessage('led', { red: red.value });
+                    }
+                    red.onmouseup = function () {
+                        sendMessage('led', { red: red.value });
                     }
                     green.oninput = function () {
                         green.classList.add('thumb-blue');
@@ -1197,11 +1195,23 @@
                         setColor();
                         displaySliderVals();
                     }
+                    green.ontouchend = function () {
+                        sendMessage('led', { green: green.value });
+                    }
+                    green.onmouseup = function () {
+                        sendMessage('led', { green: green.value });
+                    }
                     blue.oninput = function () {
                         blue.classList.add('thumb-blue');
                         blue.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
+                    }
+                    blue.ontouchend = function () {
+                        sendMessage('led', { blue: blue.value });
+                    }
+                    blue.onmouseup = function () {
+                        sendMessage('led', { blue: blue.value });
                     }
                 }
                 function displaySliderVals() {
