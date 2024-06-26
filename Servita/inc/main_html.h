@@ -364,6 +364,74 @@ const char main_html[] PROGMEM = R"rawliteral(
             transition: opacity .2s;
         }
 
+        .thumb-green {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .thumb-green::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .thumb-green::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .thumb-green:hover {
+            opacity: 1;
+        }
+
+        .thumb-blue {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .thumb-blue::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4682B4;
+            cursor: pointer;
+        }
+
+        .thumb-blue::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4682B4;
+            cursor: pointer;
+        }
+
+        .thumb-blue:hover {
+            opacity: 1;
+        }
+
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -619,7 +687,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p1ValDisplay" for="p1Range">Pour Size: </label>
-                            <input name="p1Range" type="range" min="0" max="20" value="10" class="slider" id="p1Range">
+                            <input name="p1Range" type="range" min="0" max="20" value="" class="thumb-blue" id="p1Range">
                         </div>
                     </div>
                 </div>
@@ -629,7 +697,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p2ValDisplay" for="p2Range">Pour Size: </label>
-                            <input name="p2Range" type="range" min="0" max="20" value="10" class="slider" id="p2Range">
+                            <input name="p2Range" type="range" min="0" max="20" value="" class="thumb-blue" id="p2Range">
                         </div>
                     </div>
                 </div>
@@ -639,12 +707,12 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p3Val1Display" for="p3Range1">Pump 1 Amount: </label>
-                            <input name="p3Range1" type="range" min="0" max="20" value="10" class="slider"
+                            <input name="p3Range1" type="range" min="0" max="20" value="" class="thumb-blue"
                                 id="p3Range1">
                         </div>
                         <div class="slidecontainer">
                             <label id="p3Val2Display" for="p3Range2">Pump 2 Amount: </label>
-                            <input name="p3Range2" type="range" min="0" max="20" value="10" class="slider"
+                            <input name="p3Range2" type="range" min="0" max="20" value="" class="thumb-blue"
                                 id="p3Range2">
                         </div>
                     </div>
@@ -863,10 +931,10 @@ const char main_html[] PROGMEM = R"rawliteral(
                                 timestamp: Date.now(),
                                 liveConnection: true,
                                 pourSize: {
-                                    p1: receivedData.p1,
-                                    p2: receivedData.p2,
-                                    m1: receivedData.mixed1,
-                                    m2: receivedData.mixed2
+                                    p1: receivedData.p1 / 1000,
+                                    p2: receivedData.p2 / 1000,
+                                    m1: receivedData.mixed1 / 1000,
+                                    m2: receivedData.mixed2 / 1000
                                 }
                             }
                             return appData;
@@ -877,10 +945,18 @@ const char main_html[] PROGMEM = R"rawliteral(
                                 ensureSliderIsAccurate();
                             } else if (type == 'pourSize') {
                                 appData.timestamp = Date.now();
-                                appData.pourSize.p1 = receivedData.p1;
-                                appData.pourSize.p2 = receivedData.p2;
-                                appData.pourSize.m1 = receivedData.m2;
-                                appData.pourSize.m2 = receivedData.m2;
+                                appData.pourSize.p1 = receivedData.p1 / 1000;
+                                appData.pourSize.p2 = receivedData.p2 / 1000;
+                                appData.pourSize.m1 = receivedData.mixed1 / 1000;
+                                appData.pourSize.m2 = receivedData.mixed2 / 1000;
+                                p1Range.classList.add('thumb-green');
+                                p1Range.classList.remove('thumb-blue');
+                                p2Range.classList.add('thumb-green');
+                                p2Range.classList.remove('thumb-blue');
+                                p3Range1.classList.add('thumb-green');
+                                p3Range1.classList.remove('thumb-blue');
+                                p3Range2.classList.add('thumb-green');
+                                p3Range2.classList.remove('thumb-blue');
                             } else {
                                 return console.log('Unknown type:', type);
                             }
@@ -1059,43 +1135,50 @@ const char main_html[] PROGMEM = R"rawliteral(
                     displaySliderVals();
                     setColor();
                     p3Range1.oninput = function () {
+                        p3Range1.classList.add('thumb-blue');
+                        p3Range1.classList.remove('thumb-green');
                         displaySliderVals();
                         p3ValueSafety(p3Range2, p3Range1);
                     }
                     p3Range1.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: 'MIXED_POUR_1_SIZE', size: p3Range1.value });
+                        sendMessage('changePourSize', { drink: "drink3_size1", size: p3Range1.value });
                     }
                     p3Range1.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: 'MIXED_POUR_1_SIZE', size: p3Range1.value });
+                        sendMessage('changePourSize', { drink: "drink3_size1", size: p3Range1.value });
                     }
                     p3Range2.oninput = function () {
+                        p3Range2.classList.add('thumb-blue');
+                        p3Range2.classList.remove('thumb-green');
                         displaySliderVals();
                         p3ValueSafety(p3Range1, p3Range2);
                     }
                     p3Range2.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: 'MIXED_POUR_2_SIZE', size: p3Range2.value });
+                        sendMessage('changePourSize', { drink: "drink3_size2", size: p3Range2.value });
                     }
                     p3Range2.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: 'MIXED_POUR_2_SIZE', size: p3Range2.value });
+                        sendMessage('changePourSize', { drink: "drink3_size2", size: p3Range2.value });
                     }
                     p1Range.oninput = function () {
+                        p1Range.classList.add('thumb-blue');
+                        p1Range.classList.remove('thumb-green');
                         displaySliderVals();
                     }
                     p1Range.ontouchend = function () {
-                        sendMessage('changePourSizee', { drink: 'DRINK1_POUR_SIZE', size: p1Range.value });
+                        sendMessage('changePourSize', { drink: "drink1", size: p1Range.value });
                     }
                     p1Range.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: 'DRINK1_POUR_SIZE', size: p1Range.value });
+                        sendMessage('changePourSize', { drink: "drink1", size: p1Range.value });
                     }
                     p2Range.oninput = function () {
-                        setColor();
+                        p2Range.classList.add('thumb-blue');
+                        p2Range.classList.remove('thumb-green');
                         displaySliderVals();
                     }
                     p2Range.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: 'DRINK2_POUR_SIZE', size: p2Range.value });   
+                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
                     }
                     p2Range.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: 'DRINK2_POUR_SIZE', size: p2Range.value });   
+                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
                     }
                     brightness.oninput = function () {
                         setColor();
@@ -1119,7 +1202,15 @@ const char main_html[] PROGMEM = R"rawliteral(
                     p2Range.value = appData.pourSize.p2;
                     p3Range1.value = appData.pourSize.m1;
                     p3Range2.value = appData.pourSize.m2;
-                    displaySliderVals(); 
+                    displaySliderVals();
+                    p1Range.classList.remove('thumb-blue');
+                    p1Range.classList.add('thumb-green');
+                    p2Range.classList.remove('thumb-blue');
+                    p2Range.classList.add('thumb-green');
+                    p3Range1.classList.remove('thumb-blue');
+                    p3Range1.classList.add('thumb-green');
+                    p3Range2.classList.remove('thumb-blue');
+                    p3Range2.classList.add('thumb-green');
                 }
                 function displaySliderVals() {
                     p1ValDisplay.innerHTML = "Pour Size: " + p1Range.value;

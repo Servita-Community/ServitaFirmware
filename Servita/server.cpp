@@ -119,7 +119,28 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
             } else if (strcmp(type, "changePourSize") == 0) {
-                set_pour_size(payload["drink"], payload["size"]);
+                const char* drink = payload["drink"];
+                if (drink == nullptr) {
+                    Serial.println("Missing drink field.");
+                    return;
+                }
+
+                const char* sizeStr = payload["size"];
+                uint32_t size;
+                if (!validate_and_convert_size(sizeStr, size)) return;
+
+                if (strcmp(drink, "drink1") == 0) {
+                    set_pour_size(DRINK1_POUR_SIZE, size);
+                } else if (strcmp(drink, "drink2") == 0) {
+                    set_pour_size(DRINK2_POUR_SIZE, size);
+                } else if (strcmp(drink, "drink3_size1") == 0) {
+                    set_pour_size(MIXED_POUR_1_SIZE, size);
+                } else if (strcmp(drink, "drink3_size2") == 0) {
+                    set_pour_size(MIXED_POUR_2_SIZE, size);
+                } else {
+                    Serial.println("Unknown drink type.");
+                }   
+
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
             }

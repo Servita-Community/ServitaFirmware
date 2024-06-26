@@ -81,7 +81,7 @@ void abort_pour();
 /**
  * @brief validate pour size and conver to ms from s
 */
-void validate_and_convert_size(const char* size, uint32_t* pour_size);
+bool validate_and_convert_size(const char* size, uint32_t& pour_size);
 
 /**
  * @brief Handle a websocket pour json message.
