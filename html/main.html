@@ -919,78 +919,49 @@
                 const rPump1 = document.getElementById('rPump1');
                 const rPump2 = document.getElementById('rPump2');
                 var websocket;
-                let appData;
+
+                function onOpen(event) {
+                    console.log('Connection opened');
+                    initButton();
+                    sendMessage('getPourSize', { payload: 'init' });
+                }
+
+                function onClose(event) {
+                    console.log('Connection closed');
+                }
+
+                function onMessage(event) {
+                    const message = JSON.parse(event.data);
+                    console.log('Message received:', message);
+
+                    if (message.type == 'pourSize') {
+                        console.log('Pour size message received');
+                        p1Range.value = message.p1 / 1000;
+                        p2Range.value = message.p2 / 1000;
+                        p3Range1.value = message.mixed1 / 1000;
+                        p3Range2.value = message.mixed2 / 1000;
+                        displaySliderVals();
+                        p1Range.classList.remove('thumb-blue');
+                        p1Range.classList.add('thumb-green');
+                        p2Range.classList.remove('thumb-blue');
+                        p2Range.classList.add('thumb-green');
+                        p3Range1.classList.remove('thumb-blue');
+                        p3Range1.classList.add('thumb-green');
+                        p3Range2.classList.remove('thumb-blue');
+                        p3Range2.classList.add('thumb-green');
+                    } else if (message.type == 'ledSettings') {
+                        console.log('LED settings message received');
+                    }
+                }
 
                 function initWebSocket() {
-                    function updateAppDataObject(type, receivedData) {
-                        function buildAppDataObject(receivedData) { 
-                            console.log('Building appData object:', receivedData);
-                            //build the app data object
-                            appData = {
-                                timestamp: Date.now(),
-                                liveConnection: true,
-                                pourSize: {
-                                    p1: receivedData.p1 / 1000,
-                                    p2: receivedData.p2 / 1000,
-                                    m1: receivedData.mixed1 / 1000,
-                                    m2: receivedData.mixed2 / 1000
-                                }
-                            }
-                            return appData;
-                        } 
-                        try {
-                            if (appData === undefined || appData === null) {
-                                buildAppDataObject(receivedData);
-                                ensureSliderIsAccurate();
-                            } else if (type == 'pourSize') {
-                                appData.timestamp = Date.now();
-                                appData.pourSize.p1 = receivedData.p1 / 1000;
-                                appData.pourSize.p2 = receivedData.p2 / 1000;
-                                appData.pourSize.m1 = receivedData.mixed1 / 1000;
-                                appData.pourSize.m2 = receivedData.mixed2 / 1000;
-                                p1Range.classList.add('thumb-green');
-                                p1Range.classList.remove('thumb-blue');
-                                p2Range.classList.add('thumb-green');
-                                p2Range.classList.remove('thumb-blue');
-                                p3Range1.classList.add('thumb-green');
-                                p3Range1.classList.remove('thumb-blue');
-                                p3Range2.classList.add('thumb-green');
-                                p3Range2.classList.remove('thumb-blue');
-                            } else {
-                                return console.log('Unknown type:', type);
-                            }
-                        }
-                        catch (error) {
-                            console.log('Error updating appData object:', error);
-                            //Window.alert('Error updating appData object. Frontend may not work as expected.');
-
-                        }
-                    }
                         console.log('Trying to open a WebSocket connection...');
                         websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
                         websocket.onopen = onOpen;
                         websocket.onclose = onClose;
                         websocket.onmessage = onMessage;
-                    function onOpen(event) {
-                        console.log('Connection opened');
-                        initButton();
-                        sendMessage('getPourSize', { payload: 'init' });
-                    }
-                    function onClose(event) {
-                        console.log('Connection closed');
-                        appData.liveConnection = false;
-                    }
-                    // message handler function
-                    function onMessage(event) {
-                        console.log('Message received:', event.data);
-                        const message = JSON.parse(event.data);
-                        console.log('Message received:', message);
-                        updateAppDataObject(message.type, message);
-                    }
                 }
 
-                
-                    
                 window.addEventListener('load', onLoad, false);
                 function onLoad(event) {
                     initSliders();
@@ -1195,21 +1166,6 @@
                         setColor();
                         displaySliderVals();
                     }
-                }
-                function ensureSliderIsAccurate() {
-                    p1Range.value = appData.pourSize.p1;
-                    p2Range.value = appData.pourSize.p2;
-                    p3Range1.value = appData.pourSize.m1;
-                    p3Range2.value = appData.pourSize.m2;
-                    displaySliderVals();
-                    p1Range.classList.remove('thumb-blue');
-                    p1Range.classList.add('thumb-green');
-                    p2Range.classList.remove('thumb-blue');
-                    p2Range.classList.add('thumb-green');
-                    p3Range1.classList.remove('thumb-blue');
-                    p3Range1.classList.add('thumb-green');
-                    p3Range2.classList.remove('thumb-blue');
-                    p3Range2.classList.add('thumb-green');
                 }
                 function displaySliderVals() {
                     p1ValDisplay.innerHTML = "Pour Size: " + p1Range.value;
