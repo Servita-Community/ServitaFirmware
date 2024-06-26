@@ -13,10 +13,21 @@
 #define BUTTON1_PIN 32
 #define BUTTON2_PIN 27
 
+#define CANCEL_HOLD_TIME 3000  // 3 seconds
+#define TRIGGER_HOLD_TIME 100  // 100ms
+
+enum Buttons {
+    BUTTON1,
+    BUTTON2
+};
+
 // Function declarations
+bool is_button_pressed(Buttons button);
 void init_buttons();
 void IRAM_ATTR handle_button1();
 void IRAM_ATTR handle_button2();
+void pour_trigger_check();
+void pour_cancel_check();
 void button_loop();
 
 #endif // BUTTON_H

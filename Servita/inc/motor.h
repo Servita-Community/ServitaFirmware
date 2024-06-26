@@ -26,6 +26,10 @@
 #define LIMIT_SWITCH_TOP 34
 #define LIMIT_SWITCH_BOTTOM 35
 
+#define GANTRY_TIMEOUT 15000
+#define MOTOR_BACKOFF_TIME 200
+#define LIMIT_SWITCH_DEBOUNCE 20
+
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \
     (type == PUMP2) ? "PUMP2" : \
@@ -99,6 +103,11 @@ void IRAM_ATTR disable_motor_isr();
  * @brief Handle the motor JSON payload.
 */
 void handle_motor_json(JsonObject payload);
+
+/**
+ * @brief Motor loop for the main loop.
+*/
+void motor_loop();
 
 
 #endif // PUMP_H

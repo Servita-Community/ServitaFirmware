@@ -6,6 +6,9 @@
 */
 #include "inc/pour.h"
 #include "inc/motor.h"
+#include "inc/led.h"
+#include "inc/server.h"
+#include "inc/button.h"
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
@@ -86,6 +89,10 @@ void start_pour(drink_t drink) {
 
     drink_pour.drink = drink;
     set_motor_state(&gantry, MOTOR_DOWN);
+    set_board_led(
+        drink == DRINK1 ? POUR_DRINK_1_COLOR : 
+        drink == DRINK2 ? POUR_DRINK_2_COLOR : POUR_DRINK_MIXED_COLOR
+    );
     drink_pour.state = GANTRY_DECENDING;
     Serial.printf("Starting pour for drink: %d\n", drink);
 }
@@ -97,6 +104,13 @@ void pour_seq_loop() {
         case GANTRY_DECENDING:
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW) {
                 drink_pour.pour_start_time = (uint64_t) millis();
+
+                if (is_button_pressed(BUTTON1) || is_button_pressed(BUTTON2)) {
+                    Serial.println("Button based pour cancel detected. Aborting pour...");
+                    abort_pour();
+                    break;
+                }
+
                 if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
                 if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
                 drink_pour.state = POURING;
@@ -143,6 +157,7 @@ void pour_seq_loop() {
         case GANTRY_ASCENDING:
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
                 drink_pour.state = IDLE;
+                set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
                 Serial.println("Gantry up all done switching to idle.");
             } else {
                 set_motor_state(&gantry, MOTOR_UP);
@@ -161,8 +176,16 @@ void abort_pour() {
 
     set_motor_state(&pump1, MOTOR_OFF);
     set_motor_state(&pump2, MOTOR_OFF);
-    set_motor_state(&gantry, MOTOR_UP);
-    drink_pour.state = IDLE;
+
+    if (!lockout) {
+        set_motor_state(&gantry, MOTOR_UP);
+        drink_pour.state = GANTRY_ASCENDING;
+        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+    } else {
+        Serial.println("Motor lockout in effect, will not raise gantry.");
+        drink_pour.state = IDLE;
+    }
+
     Serial.println("Pour aborted.");
 }
 
@@ -215,7 +238,9 @@ void handle_lock_json(JsonObject payload) {
     if (strcmp(action, "lock") == 0) {
         abort_pour();
         lockout = true;
+        set_board_led(LOCKOUT_COLOR);
     } else if (strcmp(action, "unlock") == 0) {
         lockout = false;
+        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
     }
 }

@@ -9,6 +9,7 @@
 #include "inc/main_html.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
+#include "inc/led.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -20,6 +21,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 Preferences wifi_preferences;
 DNSServer local_dns;
+bool hosted_locally = true;
 
 void save_credentials(const char *ssid, const char *pass) {
     wifi_preferences.begin("wifi", false);
@@ -104,17 +106,13 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             if (strcmp(type, "pour") == 0) {
                 handle_pour_json(payload);
             } else if (strcmp(type, "led") == 0) {
-                // handleLED(payload);
-            } else if (strcmp(type, "brightness") == 0) {
-                // handleBrightness(payload);
+                handle_led_json(payload);
             } else if (strcmp(type, "manual") == 0) {
                 handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
                 handle_net_json(client, payload);
             } else if (strcmp(type, "lock") == 0) {
                 handle_lock_json(payload);
-            } else if (strcmp(type, "lnum") == 0) {
-                // handleLNum(payload);
             } else if (strcmp(type, "getPourSize") == 0) {
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
@@ -166,15 +164,14 @@ void handle_net_json(AsyncWebSocketClient *client, JsonObject payload) {
 }
 
 void init_server() {
-    bool run_locally = true;
     String ssid, pass;
     get_credentials(&ssid, &pass);
 
     if (ssid.length() != 0 || pass.length() != 0 ) {
-        run_locally = !connect_to_wifi(ssid.c_str(), pass.c_str());
+        hosted_locally = !connect_to_wifi(ssid.c_str(), pass.c_str());
     }
 
-    if (run_locally) {
+    if (hosted_locally) {
         Serial.println("Starting Local AP...");
         WiFi.softAP("Servita");
         IPAddress IP = WiFi.softAPIP();
@@ -190,6 +187,8 @@ void init_server() {
     ws.onEvent(on_ws_event);
     server.addHandler(&ws);
     server.begin();
+
+    set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
 }
 
 void server_loop() {

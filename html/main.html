@@ -818,7 +818,7 @@
                     <div id="inputForm" class="settingsItems">
                         <div>
                             <label for="lNum">LEDs: </label>
-                            <input type="text" id="lNum" type="text" name="lnum" value="0" />
+                            <input type="text" id="lNum" type="text" name="lnum" value="60" />
                         </div>
                         <div>
                             <button type="button" class="controlsButtons" id="ledButton">Submit</button>
@@ -1020,11 +1020,11 @@
                     }, false);
 
                     rgbButton.addEventListener('click', function () {
-                        sendMessage('led', { value: getRgbVal() });
+                        sendMessage('led', { red: red.value, green: green.value, blue: blue.value});
                     }, false);
 
                     brightSend.addEventListener('click', function () {
-                        sendMessage('brightness', { value: getBrightness() });
+                        sendMessage('led', { brightness: getBrightness() });
                     }, false);
 
                     mCarUp.addEventListener('mousedown', function () {
@@ -1115,7 +1115,7 @@
 
                     ledButton.addEventListener('click', function () {
                         const ledNum = document.getElementById('lNum').value;
-                        sendMessage('lnum', { value: ledNum });
+                        sendMessage('led', { length: ledNum });
                     }, false);
                 }
                 /*

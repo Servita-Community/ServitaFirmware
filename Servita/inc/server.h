@@ -12,6 +12,8 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
+extern bool hosted_locally;
+
 void save_credentials(const char *ssid, const char *pass);
 void delete_credentials();
 void get_credentials(String *ssid, String *pass);
