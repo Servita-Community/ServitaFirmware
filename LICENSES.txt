@@ -1,0 +1,65 @@
+Legal and Copyright Information:
+The Servita firmware is open-source and available under the following license:
+Non-Commercial Use License
+You are free to:
+- Use: Build and use the Servita device for personal, educational, and non-commercial purposes.
+- Modify: Adapt and modify the firmware for your own use.
+- Distribute: Share the original or modified firmware non-commercially, provided you include this license and give appropriate credit.
+Under the following terms:
+- Non-Commercial: You may not use the firmware for commercial purposes. This includes selling, sublicensing, or distributing the firmware for profit without explicit written consent from Mirabo LLC.
+- Attribution: You must give appropriate credit, provide a link to the original source, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+- No Warranty: The firmware is provided "as is", without warranty of any kind.
+For any use beyond what is permitted by this license, or to obtain permission for commercial use, please contact us for permissions.
+
+ Patents
+The Servita device design is patent-pending. Unauthorized use, reproduction, or distribution of the design is prohibited. While the patent is pending, any attempt to recreate the device’s function for commercial purposes is not permitted.
+
+ Trademarks
+Servita and the Servita logo are trademarks of Mirabo LLC. Unauthorized use is prohibited.
+
+ Contact Information
+For questions or permissions, please contact:
+- Email: daniel@servita.io
+- Website: Servita.io
+
+LIBRARIES:
+
+// This project uses the FastLED library.
+// FastLED is licensed under the MIT License.
+// Copyright (c) 2013 FastLED
+// For more information, visit https://github.com/FastLED/FastLED
+
+#include <FastLED.h>
+
+// File: network_module.cpp
+
+// This file uses the AsyncTCP library.
+// AsyncTCP is licensed under the LGPL-3.0 License.
+// Copyright (c) 2017 Me-No-Dev
+// For more information, visit https://github.com/me-no-dev/AsyncTCP
+
+### DNSServer.h
+
+**Library**: DNSServer  
+**Author**: [Espressif Systems](https://github.com/espressif)  
+**License**: LGPL-2.1 License  
+**Source**: [GitHub Repository](https://github.com/espressif/arduino-esp32/blob/master/libraries/DNSServer/src/DNSServer.h)
+
+This project uses the DNSServer.h library, which is licensed under the GNU Lesser General Public License (LGPL) version 2.1. You can find the full text of the LGPL-2.1 License at the following link:
+
+[GNU Lesser General Public License Version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+
+
+#include <AsyncTCP.h>
+
+### ESPAsyncWebServer.h
+
+**Library**: ESPAsyncWebServer  
+**Author**: [dvarrel](https://github.com/dvarrel) (forked from [me-no-dev](https://github.com/me-no-dev))  
+**License**: LGPL-3.0 License  
+**Source**: [GitHub Repository](https://github.com/dvarrel/ESPAsyncWebSrv)
+
+This project uses the ESPAsyncWebServer.h library, which is licensed under the GNU Lesser General Public License (LGPL) version 3.0. You can find the full text of the LGPL-3.0 License at the following link:
+
+[GNU Lesser General Public License Version 3.0](https://www.gnu.org/licenses/lgpl-3.0.html)
+
