@@ -364,6 +364,74 @@ const char main_html[] PROGMEM = R"rawliteral(
             transition: opacity .2s;
         }
 
+        .thumb-green {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .thumb-green::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .thumb-green::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .thumb-green:hover {
+            opacity: 1;
+        }
+
+        .thumb-blue {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .thumb-blue::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4682B4;
+            cursor: pointer;
+        }
+
+        .thumb-blue::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4682B4;
+            cursor: pointer;
+        }
+
+        .thumb-blue:hover {
+            opacity: 1;
+        }
+
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -619,7 +687,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p1ValDisplay" for="p1Range">Pour Size: </label>
-                            <input name="p1Range" type="range" min="0" max="20" value="10" class="slider" id="p1Range">
+                            <input name="p1Range" type="range" min="0" max="20" value="" class="thumb-blue" id="p1Range">
                         </div>
                     </div>
                 </div>
@@ -629,7 +697,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p2ValDisplay" for="p2Range">Pour Size: </label>
-                            <input name="p2Range" type="range" min="0" max="20" value="10" class="slider" id="p2Range">
+                            <input name="p2Range" type="range" min="0" max="20" value="" class="thumb-blue" id="p2Range">
                         </div>
                     </div>
                 </div>
@@ -639,12 +707,12 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </button>
                         <div class="slidecontainer">
                             <label id="p3Val1Display" for="p3Range1">Pump 1 Amount: </label>
-                            <input name="p3Range1" type="range" min="0" max="20" value="10" class="slider"
+                            <input name="p3Range1" type="range" min="0" max="20" value="" class="thumb-blue"
                                 id="p3Range1">
                         </div>
                         <div class="slidecontainer">
                             <label id="p3Val2Display" for="p3Range2">Pump 2 Amount: </label>
-                            <input name="p3Range2" type="range" min="0" max="20" value="10" class="slider"
+                            <input name="p3Range2" type="range" min="0" max="20" value="" class="thumb-blue"
                                 id="p3Range2">
                         </div>
                     </div>
@@ -674,23 +742,19 @@ const char main_html[] PROGMEM = R"rawliteral(
                 <div id="rgbSliders" class="settingsItems">
                     <div class="settingsSubItemsCol">
                         <label id="rLabel" for="red">Red</label>
-                        <input type="range" class="slider" id="red" name="red" min="0" max="255" value="0">
+                        <input type="range" class="thumb-blue" id="red" name="red" min="0" max="255" value="">
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="gLabel" for="green">Green</label>
-                        <input type="range" class="slider" id="green" name="green" min="0" max="255" value="0">
+                        <input type="range" class="thumb-blue" id="green" name="green" min="0" max="255" value="">
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="bLabel" for="blue">Blue</label>
-                        <input type="range" class="slider" id="blue" name="blue" min="0" max="255" value="0">
-                        <button type="button" class="controlsButtons" id="rgbSend" onclick="getRgbVal()">Confirm Color</button>
+                        <input type="range" class="thumb-blue" id="blue" name="blue" min="0" max="255" value="">
                     </div>
                     <div class="settingsSubItemsCol">
                         <label id="brightValDisplay" name="brightness">Brightness Level:</label>
-                        <input name="brightness" type="range" min="0" max="255" value="127" class="slider"
-                            id="brightness">
-                        <button type="button" class="controlsButtons" id="brightSend" onclick="getBrightness()">Confirm
-                            Brightness</button>
+                        <input name="brightness" type="range" min="0" max="255" value="" class="thumb-blue" id="brightness">
                     </div>
 
                 </div>
@@ -834,8 +898,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const green = document.getElementById('green');
                 const blue = document.getElementById('blue');
                 const display = document.getElementById('display');
-                const brightSend = document.getElementById('brightSend');
-                const rgbButton = document.getElementById('rgbSend')
                 const rDisplay = document.getElementById('rLabel')
                 const bDisplay = document.getElementById('bLabel')
                 const gDisplay = document.getElementById('gLabel');
@@ -851,35 +913,73 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const mCarHome = document.getElementById('mCarHome');
                 const rPump1 = document.getElementById('rPump1');
                 const rPump2 = document.getElementById('rPump2');
-
-              
                 var websocket;
 
+                function onOpen(event) {
+                    console.log('Connection opened');
+                    initButton();
+                    sendMessage('getPourSize', { payload: 'init' });
+                    sendMessage('led', { payload: "get" });
+                }
+
+                function onClose(event) {
+                    console.log('Connection closed');
+                }
+
+                function onMessage(event) {
+                    const message = JSON.parse(event.data);
+                    console.log('Message received:', message);
+
+                    if (message.type == 'pourSize') {
+                        console.log('Pour size message received');
+                        p1Range.value = message.p1 / 1000;
+                        p2Range.value = message.p2 / 1000;
+                        p3Range1.value = message.mixed1 / 1000;
+                        p3Range2.value = message.mixed2 / 1000;
+                        displaySliderVals();
+                        p1Range.classList.remove('thumb-blue');
+                        p1Range.classList.add('thumb-green');
+                        p2Range.classList.remove('thumb-blue');
+                        p2Range.classList.add('thumb-green');
+                        p3Range1.classList.remove('thumb-blue');
+                        p3Range1.classList.add('thumb-green');
+                        p3Range2.classList.remove('thumb-blue');
+                        p3Range2.classList.add('thumb-green');
+                    } else if (message.type == 'ledSettings') {
+                        console.log('LED settings message received');
+                        red.value = message.red;
+                        green.value = message.green;
+                        blue.value = message.blue;
+                        brightness.value = message.brightness;
+                        document.getElementById('lNum').value = message.length;
+                        brightValDisplay.innerHTML = "Brightness Level: " + brightness.value;
+                        rDisplay.innerHTML = "Red Value: " + red.value;
+                        gDisplay.innerHTML = "Green Value: " + green.value;
+                        bDisplay.innerHTML = "Blue Value: " + blue.value;
+                        red.classList.add('thumb-green');
+                        red.classList.remove('thumb-blue');
+                        green.classList.add('thumb-green');
+                        green.classList.remove('thumb-blue');
+                        blue.classList.add('thumb-green');
+                        blue.classList.remove('thumb-blue');
+                        brightness.classList.add('thumb-green');
+                        brightness.classList.remove('thumb-blue');
+                        setColor();
+                    }
+                }
 
                 function initWebSocket() {
                         console.log('Trying to open a WebSocket connection...');
                         websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
                         websocket.onopen = onOpen;
                         websocket.onclose = onClose;
-                        // websocket.onmessage = onMessage; // <-- add this line
-                    function onOpen(event) {
-                        console.log('Connection opened');
-                        initButton();
-                    }
-                    
-                    function onClose(event) {
-                        console.log('Connection closed');
-                    }
+                        websocket.onmessage = onMessage;
                 }
-                
 
-                function sendData(data) {
-                    
-                }
-                    
                 window.addEventListener('load', onLoad, false);
                 function onLoad(event) {
-                    initSliders(); 
+                    initSliders();
+
                 }
 
                 function sendMessage(type, payload) {
@@ -902,14 +1002,6 @@ const char main_html[] PROGMEM = R"rawliteral(
 
                     cancelButton.addEventListener('click', function () {
                         sendMessage('pour', { drink: 'pourCancel' });
-                    }, false);
-
-                    rgbButton.addEventListener('click', function () {
-                        sendMessage('led', { red: red.value, green: green.value, blue: blue.value});
-                    }, false);
-
-                    brightSend.addEventListener('click', function () {
-                        sendMessage('led', { brightness: getBrightness() });
                     }, false);
 
                     mCarUp.addEventListener('mousedown', function () {
@@ -1011,42 +1103,116 @@ const char main_html[] PROGMEM = R"rawliteral(
                 function p3ValueSafety(pToAdj, pUserAdj) {
                     const sum = parseInt(pUserAdj.value) + parseInt(pToAdj.value);
                     if (sum > 20) {
+                        pToAdj.classList.add('thumb-blue');
+                        pToAdj.classList.remove('thumb-green');
                         pToAdj.value = 20 - pUserAdj.value;
                     }
                 }
                 function initSliders() {
+
                     displaySliderVals();
                     setColor();
                     p3Range1.oninput = function () {
-                        displaySliderVals();
+                        p3Range1.classList.add('thumb-blue');
+                        p3Range1.classList.remove('thumb-green');
                         p3ValueSafety(p3Range2, p3Range1);
+                        displaySliderVals();
+                    }
+                    p3Range1.ontouchend = function () {
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
+                    }
+                    p3Range1.onmouseup = function () {
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p3Range2.oninput = function () {
-                        displaySliderVals();
+                        p3Range2.classList.add('thumb-blue');
+                        p3Range2.classList.remove('thumb-green');
                         p3ValueSafety(p3Range1, p3Range2);
+                        displaySliderVals();
+                    }
+                    p3Range2.ontouchend = function () {
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
+                    }
+                    p3Range2.onmouseup = function () {
+                        sendMessage('changePourSize', {
+                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
+                        });
                     }
                     p1Range.oninput = function () {
+                        p1Range.classList.add('thumb-blue');
+                        p1Range.classList.remove('thumb-green');
                         displaySliderVals();
+                    }
+                    p1Range.ontouchend = function () {
+                        sendMessage('changePourSize', { drink: "drink1", size: p1Range.value });
+                    }
+                    p1Range.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: "drink1", size: p1Range.value });
                     }
                     p2Range.oninput = function () {
-                        setColor();
-                        displaySliderVals()
+                        p2Range.classList.add('thumb-blue');
+                        p2Range.classList.remove('thumb-green');
+                        displaySliderVals();
+                    }
+                    p2Range.ontouchend = function () {
+                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
+                    }
+                    p2Range.onmouseup = function () {
+                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
                     }
                     brightness.oninput = function () {
+                        brightness.classList.add('thumb-blue');
+                        brightness.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals()
                     }
+                    brightness.ontouchend = function () {
+                        sendMessage('led', { brightness: getBrightness() });
+                    }
+                    brightness.onmouseup = function () {
+                        sendMessage('led', { brightness: getBrightness() });
+                    }
                     red.oninput = function () {
+                        red.classList.add('thumb-blue');
+                        red.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
+                    }
+                    red.ontouchend = function () {
+                        sendMessage('led', { red: red.value });
+                    }
+                    red.onmouseup = function () {
+                        sendMessage('led', { red: red.value });
                     }
                     green.oninput = function () {
+                        green.classList.add('thumb-blue');
+                        green.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
                     }
+                    green.ontouchend = function () {
+                        sendMessage('led', { green: green.value });
+                    }
+                    green.onmouseup = function () {
+                        sendMessage('led', { green: green.value });
+                    }
                     blue.oninput = function () {
+                        blue.classList.add('thumb-blue');
+                        blue.classList.remove('thumb-green');
                         setColor();
                         displaySliderVals();
+                    }
+                    blue.ontouchend = function () {
+                        sendMessage('led', { blue: blue.value });
+                    }
+                    blue.onmouseup = function () {
+                        sendMessage('led', { blue: blue.value });
                     }
                 }
                 function displaySliderVals() {
@@ -1058,8 +1224,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                     rDisplay.innerHTML = "Red Value: " + red.value;
                     gDisplay.innerHTML = "Green Value: " + green.value;
                     bDisplay.innerHTML = "Blue Value: " + blue.value;
-                }
-                function sendPourSizeVals() {
                 }
                 function setColor() {
                     display.style.backgroundColor = `rgb(${red.value}, ${green.value}, ${blue.value})`;

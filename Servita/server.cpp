@@ -16,7 +16,7 @@
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
-
+// String get_pour_size();
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 Preferences wifi_preferences;
@@ -107,13 +107,51 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                 handle_pour_json(payload);
             } else if (strcmp(type, "led") == 0) {
                 handle_led_json(payload);
+                String ledStatus = get_led_status();
+                client->text(ledStatus);
             } else if (strcmp(type, "manual") == 0) {
                 handle_motor_json(payload);
             } else if (strcmp(type, "net") == 0) {
                 handle_net_json(client, payload);
             } else if (strcmp(type, "lock") == 0) {
                 handle_lock_json(payload);
-            } else {
+            } else if (strcmp(type, "getPourSize") == 0) {
+                String pourSizes = get_pour_size();
+                client->text(pourSizes);
+            } else if (strcmp(type, "changePourSize") == 0) {
+                const char* drink = payload["drink"];
+                if (drink == nullptr) {
+                    Serial.println("Missing drink field.");
+                    return;
+                }
+
+                if (strcmp(drink, "drink1") == 0) {
+                    const char* sizeStr = payload["size"];
+                    uint32_t size;
+                    if (!validate_and_convert_size(sizeStr, size)) return;
+                    set_pour_size(DRINK1_POUR_SIZE, size);
+                } else if (strcmp(drink, "drink2") == 0) {
+                    const char* sizeStr = payload["size"];
+                    uint32_t size;
+                    if (!validate_and_convert_size(sizeStr, size)) return;
+                    set_pour_size(DRINK2_POUR_SIZE, size);
+                } else if (strcmp(drink, "drink3") == 0) {
+                    uint32_t size1, size2;
+                    const char* sizeStr1 = payload["size1"];
+                    const char* sizeStr2 = payload["size2"];
+                    if (!validate_and_convert_size(sizeStr1, size1)) return;
+                    if (!validate_and_convert_size(sizeStr2, size2)) return;
+
+                    set_pour_size(MIXED_POUR_1_SIZE, size1);
+                    set_pour_size(MIXED_POUR_2_SIZE, size2);
+                } else {
+                    Serial.println("Unknown drink type.");
+                }   
+
+                String pourSizes = get_pour_size();
+                client->text(pourSizes);
+            }
+            else {
                 Serial.println("Unknown message type");
             }
         }

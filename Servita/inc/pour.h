@@ -46,6 +46,7 @@ extern uint32_t mixed1_pour_size;
 extern uint32_t mixed2_pour_size;
 extern drink_pour_t drink_pour;
 extern bool lockout;
+extern String get_pour_size();
 
 /**
  * @brief Initialize the pour system by setting the pour sizes and the drink pour state.
@@ -80,7 +81,7 @@ void abort_pour();
 /**
  * @brief validate pour size and conver to ms from s
 */
-void validate_and_convert_size(const char* size, uint32_t* pour_size);
+bool validate_and_convert_size(const char* size, uint32_t& pour_size);
 
 /**
  * @brief Handle a websocket pour json message.

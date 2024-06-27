@@ -84,6 +84,19 @@ void set_board_led(CRGB color) {
     FastLED.show(led_brightness);
 }
 
+String get_led_status() {
+    StaticJsonDocument<256> payload;
+    payload["type"] = "ledSettings";
+    payload["length"] = strip_length;
+    payload["red"] = strip_color.r;
+    payload["green"] = strip_color.g;
+    payload["blue"] = strip_color.b;
+    payload["brightness"] = led_brightness;
+    String jsonString;
+    serializeJson(payload, jsonString);
+    return jsonString;
+}
+
 void handle_led_json(JsonObject payload) {
     if (payload.containsKey("length")) {
         if (payload["length"] == nullptr)       return;
@@ -120,8 +133,9 @@ void handle_led_json(JsonObject payload) {
 
         Serial.printf("Setting brightness to %u\n", brightness);
         set_led_strip_brightness(brightness);
+    } else if (payload.containsKey("get")) {
+        Serial.println("Requested LED status");
     } else {
         Serial.println("Unknown LED command");
-        return;
     }
 }
