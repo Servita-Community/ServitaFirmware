@@ -190,7 +190,7 @@ void abort_pour() {
 }
 
 bool validate_and_convert_size(const char* sizeStr, uint32_t& size) {
-    if (sizeStr == nullptr || !isDigit(sizeStr[0]) || atoi(sizeStr) == 0) {
+    if (sizeStr == nullptr || !isDigit(sizeStr[0])) {
         Serial.println("Invalid pour size.");
         return false;
     }
