@@ -9,7 +9,7 @@
 #include "inc/server.h"
 #include "inc/serial_cmd.h"
 
-#define SDA_PIN 21 // Define IO21 as SDA pin
+#define SDA_PIN 23 // Define IO21 as SDA pin
 #define SCL_PIN 22 // Define IO22 as SCL pin
 
 
