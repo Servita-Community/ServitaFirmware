@@ -833,15 +833,15 @@ const char main_html[] PROGMEM = R"rawliteral(
             <div class="manButtons">
                 <div>
                     <button id="mCarUp" type="button" class="controlsButtons">Move
-                        Carriage Up</button>
+                        Gantry Up</button>
                 </div>
                 <div>
                     <button id="mCarDown" type="button" class="controlsButtons">Move
-                        Carriage Down</button>
+                        Gantry Down</button>
                 </div>
                 <div>
                     <button id="mCarHome" type="button" class="controlsButtons">Move
-                        Carriage To Home Position</button>
+                        Gantry To Home Position</button>
                 </div>
 
                 <div>
