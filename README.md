@@ -109,11 +109,10 @@ This will generate the `main_html.h` file in the `Servita/inc` directory.
 
 #### Installing ESPAsyncWebServer
 
-1. Download the `ESPAsyncWebServer` library from its GitHub repository:
-   - Navigate to the [ESPAsyncWebServer GitHub page](https://github.com/me-no-dev/ESPAsyncWebServer).
-   - Click the `Code` button and select `Download ZIP`.
-2. Extract the ZIP file.
-3. Move the extracted folder to your Arduino libraries directory:
+1. Copy this link into your browser: [ESPAsyncWebServer Version 3.0.6 ZIP](https://github.com/mathieucarbou/ESPAsyncWebServer/archive/refs/tags/v3.0.6.zip)
+2. Save the ZIP file to your computer.
+3. Extract the ZIP file.
+4. Move the extracted folder to your Arduino libraries directory:
    - **Windows**: `C:\Users\<YourUsername>\Documents\Arduino\libraries`
    - **Linux**: `~/Arduino/libraries`
 
@@ -233,7 +232,13 @@ Instead of using the version of `ESPAsyncWebServer` that the Arduino CLI automat
 
 3. Clone the `ESPAsyncWebServer` repository:
     ```sh
-    git clone https://github.com/me-no-dev/ESPAsyncWebServer.git
+    git clone https://github.com/mathieucarbou/ESPAsyncWebServer.git
+    ```
+
+4. Checkout the latest supported version (v3.0.6):
+    ```sh
+    cd ESPAsyncWebServer
+    git checkout v3.0.6
     ```
 
 ### Compilation and Upload
