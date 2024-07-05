@@ -2,7 +2,7 @@ name: Create Release
 
 on:
   push:
-    branches:
+    tags:
       - "v*" # Only run on version branches
 
 permissions:
