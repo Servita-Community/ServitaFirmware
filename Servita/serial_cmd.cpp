@@ -44,7 +44,7 @@ void process_serial_command() {
         command.trim(); // Remove any leading/trailing whitespace
 
         for (size_t i = 0; i < num_serial_commands; ++i) {
-            if (command.equalsIgnoreCase(serial_commands[i].command)) {
+            if (command.startsWith(serial_commands[i].command)) {
                 serial_commands[i].function();
                 return;
             }
