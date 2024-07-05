@@ -1,5 +1,5 @@
-#ifndef LED_CONTROL_H
-#define LED_CONTROL_H
+#ifndef LED_H
+#define LED_H
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
@@ -84,4 +84,4 @@ void set_strip_length(uint8_t length);
 void handle_led_json(JsonObject payload);
 String get_led_status();
 
-#endif // LED_CONTROL_H
+#endif // LED_H
