@@ -45,6 +45,9 @@ jobs:
           git clone https://github.com/mathieucarbou/ESPAsyncWebServer.git
           cd ESPAsyncWebServer
           git checkout v3.0.6
+      
+      - name: Install pyserial
+        run: pip install pyserial
 
       - name: Compile Sketch
         run: |
