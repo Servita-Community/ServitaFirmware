@@ -1,0 +1,70 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "v*" # Only run on version branches
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          sudo mv bin/arduino-cli /usr/local/bin/
+          arduino-cli config init
+
+      - name: Install arduino-cli dependencies
+        run: arduino-cli core update-index && arduino-cli core install esp32:esp32@3.0.1
+
+      - name: Install arduino-cli libraries
+        run: |
+          arduino-cli lib install "FastLED@3.7.0"
+          arduino-cli lib install "AsyncTCP@1.1.4"
+          arduino-cli lib install "ArduinoJson@7.0.4"
+
+      - name: Install Git
+        run: sudo apt-get install -y git
+
+      - name: Install ESPAsyncWebServer
+        run: |
+          cd $HOME/Arduino/libraries
+          git clone https://github.com/mathieucarbou/ESPAsyncWebServer.git
+          cd ESPAsyncWebServer
+          git checkout v3.0.6
+      
+      - name: Install pyserial
+        run: pip install pyserial
+
+      - name: Compile Sketch
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/build
+          cd $GITHUB_WORKSPACE
+          python3 export_html.py
+          arduino-cli compile --fqbn esp32:esp32:esp32 Servita --output-dir ./build
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with: 
+          files: |
+            build/Servita.ino.bin
+            build/Servita.ino.bootloader.bin
+            build/Servita.ino.elf
+            build/Servita.ino.map
+            build/Servita.ino.merged.bin
+            build/Servita.ino.partitions.bin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
