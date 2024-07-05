@@ -10,9 +10,9 @@
 #include "inc/pour.h"
 #include "inc/pins.h"
 
-motor_t pump1 = {PUMP1_HIGH_PIN, PUMP1_LOW_PIN, PUMP1_ENABLE_PIN, MOTOR_OFF, PUMP1};
-motor_t pump2 = {PUMP2_HIGH_PIN, PUMP2_LOW_PIN, PUMP2_ENABLE_PIN, MOTOR_OFF, PUMP2};
-motor_t gantry = {GANTRY_UP_PIN, GANTRY_DOWN_PIN, GANTRY_ENABLE_PIN, MOTOR_OFF, GANTRY};
+motor_t pump1 = {&PUMP1_HIGH_PIN, &PUMP1_LOW_PIN, &PUMP1_ENABLE_PIN, MOTOR_OFF, PUMP1};
+motor_t pump2 = {&PUMP2_HIGH_PIN, &PUMP2_LOW_PIN, &PUMP2_ENABLE_PIN, MOTOR_OFF, PUMP2};
+motor_t gantry = {&GANTRY_UP_PIN, &GANTRY_DOWN_PIN, &GANTRY_ENABLE_PIN, MOTOR_OFF, GANTRY};
 uint32_t last_motor_start_time = 0;
 
 void init_limit_switches() {
@@ -24,13 +24,13 @@ void init_limit_switches() {
 }
 
 void init_motor(motor_t *motor) {
-    pinMode(motor->high_pin, OUTPUT);
-    pinMode(motor->low_pin, OUTPUT);
-    pinMode(motor->enable_pin, OUTPUT);
+    pinMode(*(motor->high_pin), OUTPUT);
+    pinMode(*(motor->low_pin), OUTPUT);
+    pinMode(*(motor->enable_pin), OUTPUT);
 
-    digitalWrite(motor->high_pin, LOW);
-    digitalWrite(motor->low_pin, LOW);
-    digitalWrite(motor->enable_pin, LOW);
+    digitalWrite(*(motor->high_pin), LOW);
+    digitalWrite(*(motor->low_pin), LOW);
+    digitalWrite(*(motor->enable_pin), LOW);
 }
 
 void init_motors() {
@@ -48,32 +48,32 @@ bool set_motor_state(motor_t *motor, motor_state_t state) {
 
     switch (state) {
         case MOTOR_OFF:
-            digitalWrite(motor->high_pin, LOW);
-            digitalWrite(motor->low_pin, LOW);
-            digitalWrite(motor->enable_pin, HIGH);
+            digitalWrite(*(motor->high_pin), LOW);
+            digitalWrite(*(motor->low_pin), LOW);
+            digitalWrite(*(motor->enable_pin), HIGH);
             break;
         case MOTOR_ON:
             if (motor->type == GANTRY)                          return false;
-            digitalWrite(motor->high_pin, HIGH);
-            digitalWrite(motor->low_pin, LOW);
-            digitalWrite(motor->enable_pin, HIGH);
+            digitalWrite(*(motor->high_pin), HIGH);
+            digitalWrite(*(motor->low_pin), LOW);
+            digitalWrite(*(motor->enable_pin), HIGH);
             break;
         case MOTOR_UP:
             if (motor->type != GANTRY)                          return false;
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW)           return false;
 
-            digitalWrite(motor->high_pin, HIGH);
-            digitalWrite(motor->low_pin, LOW);
-            digitalWrite(motor->enable_pin, HIGH);
+            digitalWrite(*(motor->high_pin), HIGH);
+            digitalWrite(*(motor->low_pin), LOW);
+            digitalWrite(*(motor->enable_pin), HIGH);
             last_motor_start_time = millis();
             break;
         case MOTOR_DOWN:
             if (motor->type != GANTRY)                          return false;
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW)        return false;
 
-            digitalWrite(motor->high_pin, LOW);
-            digitalWrite(motor->low_pin, HIGH);
-            digitalWrite(motor->enable_pin, HIGH);
+            digitalWrite(*(motor->high_pin), LOW);
+            digitalWrite(*(motor->low_pin), HIGH);
+            digitalWrite(*(motor->enable_pin), HIGH);
             last_motor_start_time = millis();
             break;
     }
@@ -111,7 +111,7 @@ void motor_loop() {
         set_motor_state(&gantry, gantry.state == MOTOR_UP ? MOTOR_DOWN : MOTOR_UP);
         delay(MOTOR_BACKOFF_TIME);
         set_motor_state(&gantry, MOTOR_OFF);
-        set_board_led(LOCKOUT_COLOR);
+        set_board_color(RGB::LOCKOUT_COLOR);
         lockout = true;
         Serial.println("Gantry timeout...");
         if (drink_pour.state != IDLE)               abort_pour();

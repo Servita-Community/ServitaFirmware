@@ -10,6 +10,8 @@
 
 #include <Arduino.h>
 
+extern uint8_t SDA_PIN;
+extern uint8_t SCL_PIN;
 extern uint8_t BUTTON1_PIN;
 extern uint8_t BUTTON2_PIN;
 extern uint8_t BOARD_LED_DATA_PIN;

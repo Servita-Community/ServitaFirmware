@@ -64,7 +64,7 @@ void pour_trigger_check() {
                 millis() - button1_press_time
             );
             drink_pour.drink = MIXED;
-            set_board_led(POUR_DRINK_MIXED_COLOR);
+            set_board_color(RGB::POUR_DRINK_MIXED_COLOR);
             button1_press_time = millis();
         } else if (b2_triggerable && drink_pour.drink == DRINK1) {
             Serial.printf(
@@ -72,7 +72,7 @@ void pour_trigger_check() {
                 millis() - button2_press_time
             );
             drink_pour.drink = MIXED;
-            set_board_led(POUR_DRINK_MIXED_COLOR);
+            set_board_color(RGB::POUR_DRINK_MIXED_COLOR);
             button2_press_time = millis();
         }
     }

@@ -40,9 +40,9 @@ enum motor_type_t {
 };
 
 typedef struct {
-    uint8_t high_pin;  // High side for the pumps, up driver for the gantry.
-    uint8_t low_pin;  // Low side for the pumps, down driver for the gantry.
-    uint8_t enable_pin;  // Enable pin for the pumps and gantry.
+    uint8_t *high_pin;  // High side for the pumps, up driver for the gantry.
+    uint8_t *low_pin;  // Low side for the pumps, down driver for the gantry.
+    uint8_t *enable_pin;  // Enable pin for the pumps and gantry.
     motor_state_t state;  // State of the motor. 
     motor_type_t type;  // Type of motor.
 } motor_t;

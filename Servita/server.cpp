@@ -197,7 +197,7 @@ void init_server() {
     server.addHandler(&ws);
     server.begin();
 
-    set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+    set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
 }
 
 void server_loop() {

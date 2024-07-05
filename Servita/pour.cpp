@@ -90,9 +90,9 @@ void start_pour(drink_t drink) {
 
     drink_pour.drink = drink;
     set_motor_state(&gantry, MOTOR_DOWN);
-    set_board_led(
-        drink == DRINK1 ? POUR_DRINK_1_COLOR : 
-        drink == DRINK2 ? POUR_DRINK_2_COLOR : POUR_DRINK_MIXED_COLOR
+    set_board_color(
+        drink == DRINK1 ? RGB::POUR_DRINK_1_COLOR : 
+        drink == DRINK2 ? RGB::POUR_DRINK_2_COLOR : RGB::POUR_DRINK_MIXED_COLOR
     );
     drink_pour.state = GANTRY_DECENDING;
     Serial.printf("Starting pour for drink: %d\n", drink);
@@ -158,7 +158,7 @@ void pour_seq_loop() {
         case GANTRY_ASCENDING:
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
                 drink_pour.state = IDLE;
-                set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+                set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
                 Serial.println("Gantry up all done switching to idle.");
             } else {
                 set_motor_state(&gantry, MOTOR_UP);
@@ -181,7 +181,7 @@ void abort_pour() {
     if (!lockout) {
         set_motor_state(&gantry, MOTOR_UP);
         drink_pour.state = GANTRY_ASCENDING;
-        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+        set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
     } else {
         Serial.println("Motor lockout in effect, will not raise gantry.");
         drink_pour.state = IDLE;
@@ -239,9 +239,9 @@ void handle_lock_json(JsonObject payload) {
     if (strcmp(action, "lock") == 0) {
         abort_pour();
         lockout = true;
-        set_board_led(LOCKOUT_COLOR);
+        set_board_color(RGB::LOCKOUT_COLOR);
     } else if (strcmp(action, "unlock") == 0) {
         lockout = false;
-        set_board_led(hosted_locally ? LOCAL_WEBSERVER_COLOR : EXTERNAL_WEBSERVER_COLOR);
+        set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
     }
 }

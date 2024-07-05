@@ -1,88 +1,106 @@
-/**
- * @file led.cpp
- * @brief LED handling for Servita board LED and external LED array.
- * @version 0.1
- * @date 2024-06-08
- */
 #include "inc/led.h"
 #include "inc/pins.h"
 #include <ArduinoJson.h>
-#include <FastLED.h>
+#include <Preferences.h>
 
-CRGB strip_leds[MAXIMUM_STRIP_LED_LENGTH];
-CRGB strip_color;
-uint16_t strip_length;
-uint8_t led_brightness;
-
-CRGB board_led;
+RGB board_color;
+uint8_t board_brightness;
+RGB strip_color;
+uint8_t strip_brightness;
+uint8_t strip_length;
 
 Preferences led_preferences;
 
-
 void init_leds() {
     led_preferences.begin("led", false);
+    board_brightness = led_preferences.getUInt("boardbrightness", DEFAULT_BOARD_BRIGHTNESS);
     strip_color.r = led_preferences.getUInt("red", 0);
     strip_color.g = led_preferences.getUInt("green", 0);
     strip_color.b = led_preferences.getUInt("blue", 0);
-    strip_length = led_preferences.getUInt("length", DEFAULT_STRIP_LED_LENGTH);
-    led_brightness = led_preferences.getUInt("brightness", DEFAULT_BRIGHTNESS);
-    led_preferences.end();
+    strip_length = led_preferences.getUInt("length", DEFAULT_STRIP_LENGTH);
+    strip_brightness = led_preferences.getUInt("stripbrightness", DEFAULT_STRIP_BRIGHTNESS);
 
-    Serial.printf("LED strip color preferences (R,G,B): (%u, %u, %u)\n", strip_color.r, strip_color.g, strip_color.b);
-    Serial.printf("LED strip length preference: %u\n", strip_length);
-    Serial.printf("LED strip brightness preference: %u\n", led_brightness);
+    rmtInit(BOARD_LED_DATA_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_1, 10000000);
+    rmtInit(ARRAY_LED_DATA_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_2, 10000000);
 
-    FastLED.addLeds<WS2812, ARRAY_LED_DATA_PIN, GRB>(strip_leds, MAXIMUM_STRIP_LED_LENGTH);
-    FastLED.addLeds<SK6812, BOARD_LED_DATA_PIN, GRB>(&board_led, 1);
+    set_led_color(BOARD_LED_DATA_PIN, RGB::INITIAL_BOOT_COLOR, board_brightness, 1);
+    set_led_color(ARRAY_LED_DATA_PIN, strip_color, strip_brightness, strip_length);
 
-    fill_solid(strip_leds, strip_length, strip_color);
-    board_led = INITIAL_BOOT_COLOR;
-    FastLED.show(led_brightness);
-
-    Serial.println("LEDs initialized");
+    Serial.println("LEDs initialized.");
 }
 
-void set_led_strip_length(uint16_t length) {
-    if (length > MAXIMUM_STRIP_LED_LENGTH)
-        length = MAXIMUM_STRIP_LED_LENGTH;
+void set_led_color(uint8_t pin, RGB color, uint8_t brightness, uint8_t num_leds) {
+    uint16_t num_of_bits = num_leds * 24;
+    rmt_data_t led_data[num_of_bits];
+    int i = 0;
 
+    uint8_t scaled_red = (color.r * brightness) / 255;
+    uint8_t scaled_green = (color.g * brightness) / 255;
+    uint8_t scaled_blue = (color.b * brightness) / 255;
+
+    for (int led = 0; led < num_leds; led++) {
+        for (int col = 0; col < 3; col++) {
+            uint8_t col_val = (col == 1) ? scaled_red : (col == 0) ? scaled_green : scaled_blue;
+            for (int bit = 0; bit < 8; bit++) {
+                led_data[i].level0 = 1;
+                led_data[i].duration0 = (col_val & (1 << (7 - bit))) ? 8 : 4;
+                led_data[i].level1 = 0;
+                led_data[i].duration1 = (col_val & (1 << (7 - bit))) ? 4 : 8;
+                i++;
+            }
+        }
+    }
+    rmtWrite(pin, led_data, num_of_bits, RMT_WAIT_FOR_EVER);
+}
+
+void set_board_color(RGB color) {
+    board_color = color;
+    set_led_color(BOARD_LED_DATA_PIN, color, board_brightness, 1);
+}
+
+void set_board_brightness(uint8_t brightness) {
+    board_brightness = brightness;
+    set_led_color(BOARD_LED_DATA_PIN, board_color, brightness, 1);
+
+    led_preferences.begin("led", false);
+    led_preferences.putUInt("boardbrightness", board_brightness);
+    led_preferences.end();
+}
+
+void set_strip_color(RGB color) {
+    strip_color = color;
+    set_led_color(ARRAY_LED_DATA_PIN, color, strip_brightness, strip_length);
+
+    led_preferences.begin("led", false);
+    led_preferences.putUInt("red", color.r);
+    led_preferences.putUInt("green", color.g);
+    led_preferences.putUInt("blue", color.b);
+    led_preferences.end();
+}
+
+void set_strip_brightness(uint8_t brightness) {
+    strip_brightness = brightness;
+    set_led_color(ARRAY_LED_DATA_PIN, strip_color, brightness, strip_length);
+
+    led_preferences.begin("led", false);
+    led_preferences.putUInt("stripbrightness", strip_brightness);
+    led_preferences.end();
+}
+
+void set_strip_length(uint8_t length) {
+    if (length > MAXIMUM_STRIP_LENGTH)
+        length = MAXIMUM_STRIP_LENGTH;
+    
     if (length < strip_length) {
-        fill_solid(strip_leds + length, strip_length - length, CRGB::Black);
+        set_led_color(ARRAY_LED_DATA_PIN, RGB::BLACK, strip_brightness, strip_length);
     }
 
+    set_led_color(ARRAY_LED_DATA_PIN, strip_color, strip_brightness, length);
     strip_length = length;
-    fill_solid(strip_leds, strip_length, strip_color);
-    FastLED.show(led_brightness);
 
     led_preferences.begin("led", false);
     led_preferences.putUInt("length", strip_length);
     led_preferences.end();
-}
-
-void set_led_strip_color(CRGB color) {
-    strip_color = color;
-    fill_solid(strip_leds, strip_length, strip_color);
-    FastLED.show(led_brightness);
-
-    led_preferences.begin("led", false);
-    led_preferences.putUInt("red", strip_color.r);
-    led_preferences.putUInt("green", strip_color.g);
-    led_preferences.putUInt("blue", strip_color.b);
-    led_preferences.end();
-}
-
-void set_led_strip_brightness(uint8_t brightness) {
-    led_brightness = brightness;
-    FastLED.show(led_brightness);
-
-    led_preferences.begin("led", false);
-    led_preferences.putUInt("brightness", led_brightness);
-    led_preferences.end();
-}
-
-void set_board_led(CRGB color) {
-    board_led = color;
-    FastLED.show(led_brightness);
 }
 
 String get_led_status() {
@@ -92,7 +110,7 @@ String get_led_status() {
     payload["red"] = strip_color.r;
     payload["green"] = strip_color.g;
     payload["blue"] = strip_color.b;
-    payload["brightness"] = led_brightness;
+    payload["brightness"] = strip_brightness;
     String jsonString;
     serializeJson(payload, jsonString);
     return jsonString;
@@ -106,9 +124,9 @@ void handle_led_json(JsonObject payload) {
         if (size == strip_length)               return;
 
         Serial.printf("Setting strip length to %u\n", size);
-        set_led_strip_length(size);
+        set_strip_length(size);
     } else if (payload.containsKey("red") || payload.containsKey("green") || payload.containsKey("blue")) {
-        CRGB new_color = strip_color;
+        RGB new_color = strip_color;
 
         if (payload["red"] != nullptr) {
             uint8_t r = atoi(payload["red"]);
@@ -125,15 +143,15 @@ void handle_led_json(JsonObject payload) {
         
         if (new_color == strip_color) return;
         Serial.printf("Setting color to (%u, %u, %u)\n", new_color.r, new_color.g, new_color.b);
-        set_led_strip_color(new_color);
+        set_strip_color(new_color);
     } else if (payload.containsKey("brightness")) {
         if (payload["brightness"] == nullptr)       return;
 
         uint8_t brightness = atoi(payload["brightness"]);
-        if (brightness == led_brightness)         return;
+        if (brightness == strip_brightness)         return;
 
         Serial.printf("Setting brightness to %u\n", brightness);
-        set_led_strip_brightness(brightness);
+        set_strip_brightness(brightness);
     } else if (payload.containsKey("get")) {
         Serial.println("Requested LED status");
     } else {
