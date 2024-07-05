@@ -9,24 +9,27 @@
 #include "inc/motor.h"
 #include "inc/pour.h"
 #include "inc/server.h"
+#include "inc/brd_version.h"
 
 // Define commands
 serial_command_t serial_commands[] = {
-    {"drink1", [](){ start_pour(DRINK1); }},
-    {"drink2", [](){ start_pour(DRINK2); }},
-    {"drink3", [](){ start_pour(MIXED); }},
-    {"printPourSizes", [](){
+    {"drink1", [](String params){ start_pour(DRINK1); }},
+    {"drink2", [](String params){ start_pour(DRINK2); }},
+    {"drink3", [](String params){ start_pour(MIXED); }},
+    {"printPourSizes", [](String params){
         Serial.printf("Drink 1: %u ms\n", drink1_pour_size);
         Serial.printf("Drink 2: %u ms\n", drink2_pour_size);
         Serial.printf("Mixed 1: %u ms\n", mixed1_pour_size);
         Serial.printf("Mixed 2: %u ms\n", mixed2_pour_size);
     }},
-    {"down", [](){ set_motor_state(&gantry, MOTOR_DOWN); }},
-    {"up", [](){ set_motor_state(&gantry, MOTOR_UP); }},
-    {"stop", [](){ set_motor_state(&gantry, MOTOR_OFF); }},
-    {"cancel", abort_pour},
-    {"restart", [](){ ESP.restart(); }},
-    {"deleteCredentials", delete_credentials},
+    {"down", [](String params){ set_motor_state(&gantry, MOTOR_DOWN); }},
+    {"up", [](String params){ set_motor_state(&gantry, MOTOR_UP); }},
+    {"stop", [](String params){ set_motor_state(&gantry, MOTOR_OFF); }},
+    {"cancel", [](String params){ abort_pour(); }},
+    {"restart", [](String params){ ESP.restart(); }},
+    {"deleteCredentials", [](String params){ delete_credentials(); }},
+    {"getBrdVersion", [](String params){ get_board_version(); }},
+    {"saveBrdVersion", handle_save_brd_version}
 };
 
 // Number of commands
@@ -43,9 +46,21 @@ void process_serial_command() {
         String command = Serial.readStringUntil('\n');
         command.trim(); // Remove any leading/trailing whitespace
 
+        int firstSpaceIndex = command.indexOf(' ');
+        String cmd;
+        String params;
+
+        if (firstSpaceIndex != -1) {
+            cmd = command.substring(0, firstSpaceIndex);
+            params = command.substring(firstSpaceIndex + 1);
+        } else {
+            cmd = command;
+            params = "";
+        }
+
         for (size_t i = 0; i < num_serial_commands; ++i) {
-            if (command.startsWith(serial_commands[i].command)) {
-                serial_commands[i].function();
+            if (cmd.equalsIgnoreCase(serial_commands[i].command)) {
+                serial_commands[i].function(params);
                 return;
             }
         }

@@ -13,7 +13,7 @@
 // Define command struct
 typedef struct {
     const char *command;
-    void (*function)();
+    std::function<void(String)> function;
 } serial_command_t;
 
 // Function declarations
