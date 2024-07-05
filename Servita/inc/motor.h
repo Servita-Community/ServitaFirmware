@@ -11,21 +11,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#define PUMP1_HIGH_PIN 17
-#define PUMP1_LOW_PIN 5
-#define PUMP1_ENABLE_PIN 16
-
-#define PUMP2_HIGH_PIN 15
-#define PUMP2_LOW_PIN 13
-#define PUMP2_ENABLE_PIN 12
-
-#define GANTRY_UP_PIN 21
-#define GANTRY_DOWN_PIN 19
-#define GANTRY_ENABLE_PIN 18
-
-#define LIMIT_SWITCH_TOP 34
-#define LIMIT_SWITCH_BOTTOM 35
-
 #define GANTRY_TIMEOUT 15000
 #define MOTOR_BACKOFF_TIME 200
 #define LIMIT_SWITCH_DEBOUNCE 20

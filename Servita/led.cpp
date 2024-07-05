@@ -5,6 +5,7 @@
  * @date 2024-06-08
  */
 #include "inc/led.h"
+#include "inc/pins.h"
 #include <ArduinoJson.h>
 #include <FastLED.h>
 

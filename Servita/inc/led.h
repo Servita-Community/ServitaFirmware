@@ -11,8 +11,6 @@
 #include <FastLED.h>
 #include <Preferences.h>
 
-#define BOARD_LED_DATA_PIN 2
-#define ARRAY_LED_DATA_PIN 4
 #define MAXIMUM_STRIP_LED_LENGTH 120
 #define DEFAULT_STRIP_LED_LENGTH 60
 #define DEFAULT_BRIGHTNESS 128

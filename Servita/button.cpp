@@ -9,6 +9,7 @@
 #include "inc/pour.h"
 #include "inc/motor.h"
 #include "inc/led.h"
+#include "inc/pins.h"
 
 volatile bool button1_pressed = false;
 volatile bool button2_pressed = false;

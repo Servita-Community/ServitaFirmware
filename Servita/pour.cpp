@@ -9,6 +9,7 @@
 #include "inc/led.h"
 #include "inc/server.h"
 #include "inc/button.h"
+#include "inc/pins.h"
 #include <Preferences.h>
 #include <ArduinoJson.h>
 

@@ -8,6 +8,7 @@
 #include "inc/motor.h"
 #include "inc/led.h"
 #include "inc/pour.h"
+#include "inc/pins.h"
 
 motor_t pump1 = {PUMP1_HIGH_PIN, PUMP1_LOW_PIN, PUMP1_ENABLE_PIN, MOTOR_OFF, PUMP1};
 motor_t pump2 = {PUMP2_HIGH_PIN, PUMP2_LOW_PIN, PUMP2_ENABLE_PIN, MOTOR_OFF, PUMP2};

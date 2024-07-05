@@ -10,9 +10,6 @@
 
 #include <Arduino.h>
 
-#define BUTTON1_PIN 32
-#define BUTTON2_PIN 27
-
 #define CANCEL_HOLD_TIME 3000  // 3 seconds
 #define TRIGGER_HOLD_TIME 100  // 100ms
 
