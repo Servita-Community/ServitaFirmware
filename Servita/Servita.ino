@@ -5,6 +5,7 @@
 #include "inc/server.h"
 #include "inc/serial_cmd.h"
 #include "inc/pins.h"
+#include "inc/expansion.h"
 #include "Arduino.h"
 
 void setup() {
@@ -12,6 +13,7 @@ void setup() {
   delay(100);
 
   set_pins_based_on_board_version();
+  init_expansion();
   init_leds();
   init_limit_switches();
   init_motors();

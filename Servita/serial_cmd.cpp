@@ -10,6 +10,7 @@
 #include "inc/pour.h"
 #include "inc/server.h"
 #include "inc/brd_version.h"
+#include "inc/expansion.h"
 
 // Define commands
 serial_command_t serial_commands[] = {
@@ -29,7 +30,9 @@ serial_command_t serial_commands[] = {
     {"restart", [](String params){ ESP.restart(); }},
     {"deleteCredentials", [](String params){ delete_credentials(); }},
     {"getBrdVersion", [](String params){ get_board_version(); }},
-    {"saveBrdVersion", handle_save_brd_version}
+    {"saveBrdVersion", handle_save_brd_version},
+    {"getExpansionType", [](String params){get_expansion_version(); }},
+    {"saveExpansionType", handle_save_expansion_type},
 };
 
 // Number of commands
