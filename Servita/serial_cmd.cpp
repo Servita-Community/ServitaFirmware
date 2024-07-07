@@ -10,6 +10,7 @@
 #include "inc/pour.h"
 #include "inc/server.h"
 #include "inc/brd_version.h"
+#include "inc/led.h"
 #include "inc/expansion.h"
 
 // Define commands
@@ -35,6 +36,7 @@ serial_command_t serial_commands[] = {
     {"saveBrdVersion", handle_save_brd_version},
     {"getExpansionType", [](String params){get_expansion_version(); }},
     {"saveExpansionType", handle_save_expansion_type},
+    {"setBoardLed", handle_set_board_led},
 };
 
 // Number of commands

@@ -158,3 +158,20 @@ void handle_led_json(JsonObject payload) {
         Serial.println("Unknown LED command");
     }
 }
+
+void handle_set_board_led(String params) {
+    int firstSpaceIndex = params.indexOf(' ');
+    String color;
+
+    if (firstSpaceIndex == -1 && params.length() > 0) {
+        color = params;
+    } else {
+        Serial.println("setBaordLed should be formatted as 'setBoardLed <color>'");
+        return;
+    }
+
+    // Color should come in as a hex string ie.. 0xFF00FF or 0x00FF00
+    long color_value = strtol(color.c_str(), NULL, 16);
+    RGB new_color = RGB(color_value);
+    set_board_color(new_color);
+}

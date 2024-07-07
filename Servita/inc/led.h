@@ -82,6 +82,7 @@ void set_strip_color(RGB color);
 void set_strip_brightness(uint8_t brightness);
 void set_strip_length(uint8_t length);
 void handle_led_json(JsonObject payload);
+void handle_set_board_led(String params);
 String get_led_status();
 
 #endif // LED_H
