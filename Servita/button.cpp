@@ -9,6 +9,7 @@
 #include "inc/pour.h"
 #include "inc/motor.h"
 #include "inc/led.h"
+#include "inc/expansion.h"
 #include "inc/pins.h"
 
 volatile bool button1_pressed = false;
@@ -18,15 +19,21 @@ unsigned long button1_press_time = 0;
 unsigned long button2_press_time = 0;
 
 bool is_button_pressed(Buttons button) {
-    return digitalRead(button == BUTTON1 ? BUTTON1_PIN : BUTTON2_PIN) == LOW;
+    if (expansion_type == DUO_BOARD) {
+        return digitalRead(button == BUTTON1 ? BUTTON1_PIN : BUTTON2_PIN) == LOW;
+    } else {
+        if (button == BUTTON1)      return digitalRead(BUTTON1_PIN) == LOW;
+        else                        return false;
+    }
 }
 
 void init_buttons() {
     pinMode(BUTTON1_PIN, INPUT_PULLUP);
-    pinMode(BUTTON2_PIN, INPUT_PULLUP);
+    if (expansion_type == DUO_BOARD)        pinMode(BUTTON2_PIN, INPUT_PULLUP);
 
     attachInterrupt(digitalPinToInterrupt(BUTTON1_PIN), handle_button1, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(BUTTON2_PIN), handle_button2, CHANGE);
+    if (expansion_type == DUO_BOARD)
+        attachInterrupt(digitalPinToInterrupt(BUTTON2_PIN), handle_button2, CHANGE);
 }
 
 void IRAM_ATTR handle_button1() {

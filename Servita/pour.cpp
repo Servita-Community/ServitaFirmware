@@ -10,6 +10,7 @@
 #include "inc/server.h"
 #include "inc/button.h"
 #include "inc/pins.h"
+#include "inc/expansion.h"
 #include <Preferences.h>
 #include <ArduinoJson.h>
 
@@ -42,9 +43,12 @@ String get_pour_size() {
     StaticJsonDocument<256> payload;
     payload["type"] = "pourSize";
     payload["p1"] = String(drink1_pour_size);
-    payload["p2"] = String(drink2_pour_size);
-    payload["mixed1"] = String(mixed1_pour_size);
-    payload["mixed2"] = String(mixed2_pour_size);
+
+    if (expansion_type == DUO_BOARD) {
+        payload["p2"] = String(drink2_pour_size);
+        payload["mixed1"] = String(mixed1_pour_size);
+        payload["mixed2"] = String(mixed2_pour_size);
+    }
     String jsonString;
     serializeJson(payload, jsonString);
     return jsonString;
@@ -78,6 +82,11 @@ void set_pour_size(pour_size_setting_t setting, uint32_t pour_size) {
 }
 
 void start_pour(drink_t drink) {
+    if (drink != DRINK1 && expansion_type != DUO_BOARD) {
+        Serial.println("Duo Board required for drinks 2 & 3.");
+        return;
+    }
+
     if (drink_pour.state != IDLE) {
         Serial.println("Pour already in progress.");
         return;
@@ -176,7 +185,8 @@ void abort_pour() {
     }
 
     set_motor_state(&pump1, MOTOR_OFF);
-    set_motor_state(&pump2, MOTOR_OFF);
+
+    if (expansion_type == DUO_BOARD)        set_motor_state(&pump2, MOTOR_OFF);
 
     if (!lockout) {
         set_motor_state(&gantry, MOTOR_UP);

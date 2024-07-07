@@ -19,9 +19,11 @@ serial_command_t serial_commands[] = {
     {"drink3", [](String params){ start_pour(MIXED); }},
     {"printPourSizes", [](String params){
         Serial.printf("Drink 1: %u ms\n", drink1_pour_size);
-        Serial.printf("Drink 2: %u ms\n", drink2_pour_size);
-        Serial.printf("Mixed 1: %u ms\n", mixed1_pour_size);
-        Serial.printf("Mixed 2: %u ms\n", mixed2_pour_size);
+        if (expansion_type == DUO_BOARD) {
+            Serial.printf("Drink 2: %u ms\n", drink2_pour_size);
+            Serial.printf("Mixed 1: %u ms\n", mixed1_pour_size);
+            Serial.printf("Mixed 2: %u ms\n", mixed2_pour_size);
+        }
     }},
     {"down", [](String params){ set_motor_state(&gantry, MOTOR_DOWN); }},
     {"up", [](String params){ set_motor_state(&gantry, MOTOR_UP); }},

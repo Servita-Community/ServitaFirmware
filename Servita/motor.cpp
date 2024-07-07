@@ -9,6 +9,7 @@
 #include "inc/led.h"
 #include "inc/pour.h"
 #include "inc/pins.h"
+#include "inc/expansion.h"
 
 motor_t pump1 = {&PUMP1_HIGH_PIN, &PUMP1_LOW_PIN, &PUMP1_ENABLE_PIN, MOTOR_OFF, PUMP1};
 motor_t pump2 = {&PUMP2_HIGH_PIN, &PUMP2_LOW_PIN, &PUMP2_ENABLE_PIN, MOTOR_OFF, PUMP2};
@@ -35,7 +36,7 @@ void init_motor(motor_t *motor) {
 
 void init_motors() {
     init_motor(&pump1);
-    init_motor(&pump2);
+    if (expansion_type == DUO_BOARD)        init_motor(&pump2);
     init_motor(&gantry);
 
     set_motor_state(&gantry, MOTOR_UP);
@@ -44,6 +45,7 @@ void init_motors() {
 }
 
 bool set_motor_state(motor_t *motor, motor_state_t state) {
+    if (motor->type == PUMP2 && expansion_type != DUO_BOARD)      return false;
     if (motor->state == state)      return false;
 
     switch (state) {
