@@ -7,9 +7,11 @@
 
 #include "inc/server.h"
 #include "inc/main_html.h"
+#include "inc/main_mini_html.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
 #include "inc/led.h"
+#include "inc/expansion.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -190,9 +192,17 @@ void init_server() {
         Serial.println("Local DNS server started...");
     }
 
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send_P(200, "text/html", main_html);
-    });
+    if (expansion_type == DUO_BOARD) {
+        Serial.println("Hosting full webserver...");
+        server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send_P(200, "text/html", main_html);
+        });
+    } else {
+        Serial.println("Hosting mini webserver...");
+        server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send_P(200, "text/html", main_mini_html);
+        });
+    }
     ws.onEvent(on_ws_event);
     server.addHandler(&ws);
     server.begin();
