@@ -51,7 +51,11 @@ void save_expansion_type(expansion_t type) {
     Wire.beginTransmission(EXPANSION_EEPROM_ADDR);
     Wire.write(EXPANSION_CODE_BYTE_ADDR);
     Wire.write((uint8_t) type);
-    Wire.endTransmission();
+    if (Wire.endTransmission() != 0) {
+        Serial.println("Error writing to expansion board eeprom");
+        return;
+    }
+
     Serial.printf("Saved expansion type: 0x%x\n", type);
 }
 
