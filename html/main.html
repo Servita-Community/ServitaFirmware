@@ -222,8 +222,6 @@
             justify-self: center;
         }
 
-        
-
         #submitCredentialsContainer {
             align-self: center;
             justify-self: center;
@@ -822,6 +820,26 @@
              
                     </div>
                 </div>
+                <div id="apiKeyContainer" class="settingsContainer">
+                    <div class="settingsSubTitle">
+                        <h3>
+                            Sinric Pro API Key
+                        </h3>
+                    </div>
+                    <div id="inputForm" class="settingsItems">
+                        <div>
+                            <label for="apiKey">Api Key: </label>
+                            <input type="text" id="apiKey" type="text" name="apiKey" value="60" />
+                        </div>
+                        <div>
+                            <button type="button" class="controlsButtons" id="apiKeyButton">Submit</button>
+                        </div>
+             
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
         <div id="manualControls" class="appPage" style="display:none;">
@@ -905,6 +923,7 @@
                 const lButton = document.getElementById('lButton');
                 const uButton = document.getElementById('uButton');
                 const ledButton = document.getElementById('ledButton');
+                const apiKeyButton = document.getElementById('apiKeyButton');
                 const brightness = document.getElementById('brightness');
                 const sendCredentials = document.getElementById('submitCredentials');
                 const mCarUp = document.getElementById('mCarUp');
@@ -968,11 +987,15 @@
                 }
 
                 function initWebSocket() {
+                    if (window.location.href.includes('file:///')) {
+                        console.log('Development mode, not opening WebSocket connection');
+                    } else {
                         console.log('Trying to open a WebSocket connection...');
                         websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
                         websocket.onopen = onOpen;
                         websocket.onclose = onClose;
                         websocket.onmessage = onMessage;
+                    }
                 }
 
                 window.addEventListener('load', onLoad, false);
@@ -1092,6 +1115,10 @@
                     ledButton.addEventListener('click', function () {
                         const ledNum = document.getElementById('lNum').value;
                         sendMessage('led', { length: ledNum });
+                    }, false);
+                    apiKeyButton.addEventListener('click', function () {
+                        const apiKey = document.getElementById('apiKey').value;
+                        sendMessage('apiKey', { key: apiKey });
                     }, false);
                 }
                 /*
