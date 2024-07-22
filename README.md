@@ -172,7 +172,12 @@ If your ESP32 board uses the CH340 USB-to-Serial chip, you may need to install t
     arduino-cli core install esp32:esp32@3.0.1
     ```
 
-5. Install Git if it's not already installed:
+5. Install the required Python packages:
+    ```sh
+    pip install pyserial
+    ```
+
+6. Install Git if it's not already installed:
     Download and install Git from the [official Git website](https://git-scm.com/).
 
 #### Mac
@@ -268,6 +273,38 @@ To monitor the serial output of the ESP32, use the following command:
 ```sh
 arduino-cli monitor -p /dev/ttyUSB0 -b esp32:esp32:esp32 -c baudrate=115200
 ```
+
+### Using `manufacturing.py`
+
+#### Prerequisites
+
+1. Install the `arduino-cli` tool for your operating system.
+
+2. Download the desired firmware version from the [ServitaFirmware releases](https://github.com/Servita-Community/ServitaFirmware/releases).
+
+3. Place the release files into a folder named `build` in the root of the Servita firmware repository.
+
+#### Run
+
+Run the following command:
+
+```sh
+python manufacturing.py --port USB_PORT
+```
+
+Replace `USB_PORT` with the actual USB port where the device is connected.
+
+#### Output Colors
+
+The script will provide output as it goes through various stages. The final output color indicates the configuration status of the device:
+
+| Color   | Description                                                                 |
+|---------|-----------------------------------------------------------------------------|
+| Cyan    | Both the ESP32 and the expansion board have been successfully configured.   |
+| Yellow  | Only the ESP32 main board has been configured.                              |
+| Red     | Neither the main board nor the expansion board were configured properly.    |
+
+If you follow these steps and the output colors, you can easily determine the success of the configuration process.
 
 ## Conclusion
 
