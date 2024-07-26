@@ -83,17 +83,17 @@ void set_pour_size(pour_size_setting_t setting, uint32_t pour_size) {
 
 void start_pour(drink_t drink) {
     if (drink != DRINK1 && expansion_type != DUO_BOARD) {
-        Serial.println("Duo Board required for drinks 2 & 3.");
+        Serial.printf("Duo Board required for drinks 2 & 3.");
         return;
     }
 
     if (drink_pour.state != IDLE) {
-        Serial.println("Pour already in progress.");
+        Serial.printf("Pour already in progress.");
         return;
     }
 
     if (lockout) {
-        Serial.println("Motor lockout in effect, cannot pour.");
+        Serial.printf("Motor lockout in effect, cannot pour.");
         return;
     }
 
@@ -116,7 +116,7 @@ void pour_seq_loop() {
                 drink_pour.pour_start_time = (uint64_t) millis();
 
                 if (is_button_pressed(BUTTON1) || is_button_pressed(BUTTON2)) {
-                    Serial.println("Button based pour cancel detected. Aborting pour...");
+                    Serial.printf("Button based pour cancel detected. Aborting pour...");
                     abort_pour();
                     break;
                 }
@@ -124,7 +124,7 @@ void pour_seq_loop() {
                 if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
                 if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
                 drink_pour.state = POURING;
-                Serial.println("Gantry down all done switching to pouring.");
+                Serial.printf("Gantry down all done switching to pouring.");
             } else {
                 set_motor_state(&gantry, MOTOR_DOWN);
             }
@@ -137,7 +137,7 @@ void pour_seq_loop() {
                         set_motor_state(&pump1, MOTOR_OFF);
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
-                        Serial.println("Pouring complete switching to gantry up.");
+                        Serial.printf("Pouring complete switching to gantry up.");
                     }
                     break;
                 case DRINK2:
@@ -145,7 +145,7 @@ void pour_seq_loop() {
                         set_motor_state(&pump2, MOTOR_OFF);
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
-                        Serial.println("Pouring complete switching to gantry up.");
+                        Serial.printf("Pouring complete switching to gantry up.");
                     }
                     break;
                 case MIXED:
@@ -158,7 +158,7 @@ void pour_seq_loop() {
                     if (pump1_done && pump2_done) {
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
-                        Serial.println("Pouring complete switching to gantry up.");
+                        Serial.printf("Pouring complete switching to gantry up.");
                     }
                     break;
             }
@@ -168,7 +168,7 @@ void pour_seq_loop() {
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
                 drink_pour.state = IDLE;
                 set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
-                Serial.println("Gantry up all done switching to idle.");
+                Serial.printf("Gantry up all done switching to idle.");
             } else {
                 set_motor_state(&gantry, MOTOR_UP);
             }
@@ -180,7 +180,7 @@ void pour_seq_loop() {
 
 void abort_pour() {
     if (drink_pour.state == IDLE) {
-        Serial.println("No pour to abort.");
+        Serial.printf("No pour to abort.");
         return;
     }
 
@@ -193,16 +193,16 @@ void abort_pour() {
         drink_pour.state = GANTRY_ASCENDING;
         set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
     } else {
-        Serial.println("Motor lockout in effect, will not raise gantry.");
+        Serial.printf("Motor lockout in effect, will not raise gantry.");
         drink_pour.state = IDLE;
     }
 
-    Serial.println("Pour aborted.");
+    Serial.printf("Pour aborted.");
 }
 
 bool validate_and_convert_size(const char* sizeStr, uint32_t& size) {
     if (sizeStr == nullptr || !isDigit(sizeStr[0])) {
-        Serial.println("Invalid pour size.");
+        Serial.printf("Invalid pour size.");
         return false;
     }
     size = atoi(sizeStr) * S_TO_MS;
@@ -212,7 +212,7 @@ bool validate_and_convert_size(const char* sizeStr, uint32_t& size) {
 void handle_pour_json(JsonObject payload) {
     const char* drink = payload["drink"];
     if (drink == nullptr) {
-        Serial.println("Missing drink field.");
+        Serial.printf("Missing drink field.");
         return;
     }
 
@@ -237,10 +237,10 @@ void handle_pour_json(JsonObject payload) {
         set_pour_size(MIXED_POUR_2_SIZE, size2);
         start_pour(MIXED);
     } else if (strcmp(drink, "pourCancel") == 0) {
-        Serial.println("Aborting pour.");
+        Serial.printf("Aborting pour.");
         abort_pour();
     } else {
-        Serial.println("Unknown drink type.");
+        Serial.printf("Unknown drink type.");
     }
 }
 

@@ -51,31 +51,31 @@ const char main_html[] PROGMEM = R"rawliteral(
             flex-direction: column;
             align-content: center;
             justify-content: center;
-            /* row-gap: 100px; */
+            
         }
         #mCarUp {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         #mCarDown {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         #rPump1 {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         #rPump2 {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+/Edge */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none; 
         }
         .appPage {
             height: fit-content;
@@ -223,8 +223,6 @@ const char main_html[] PROGMEM = R"rawliteral(
             justify-self: center;
         }
 
-        
-
         #submitCredentialsContainer {
             align-self: center;
             justify-self: center;
@@ -286,7 +284,6 @@ const char main_html[] PROGMEM = R"rawliteral(
             align-items: center;
             width: 100%;
             row-gap: 1vh;
-            /* position: fixed; */
         }
 
         .settingsItems {
@@ -449,11 +446,8 @@ const char main_html[] PROGMEM = R"rawliteral(
             background: #4682B4;
             cursor: pointer;
         }
-
-        /* Mouse-over effects */
         .slider:hover {
             opacity: 1;
-            /* Fully shown on mouse-over */
         }
 
         #luButtonContainer {
@@ -491,8 +485,6 @@ const char main_html[] PROGMEM = R"rawliteral(
 
 
         @media (min-width:320px) {
-
-            /* smartphones, iPhone, portrait 480x320 phones */
             .manButtons {
                 column-gap: 5%;
                 row-gap: 5%;
@@ -539,20 +531,15 @@ const char main_html[] PROGMEM = R"rawliteral(
         }
 
         @media (min-width:481px) {
-            /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */
         }
 
         @media (min-width:641px) {
-            /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
         }
 
         @media (min-width:961px) {
-            /* tablet, landscape iPad, lo-res laptops ands desktops */
         }
 
         @media (min-width:1025px) {
-
-            /* big landscape tablets, laptops, and desktops */
             .settingsItems {
                 min-width: 400px;
                 max-width: 400px;
@@ -586,8 +573,6 @@ const char main_html[] PROGMEM = R"rawliteral(
         }
 
         @media (min-width:1281px) {
-
-            /* hi-res laptops and desktops */
             #cancelContainer {
                 width: 230px;
             }
@@ -665,6 +650,38 @@ const char main_html[] PROGMEM = R"rawliteral(
                 background-size: 100%;
                 transition: background .1s;
             }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
     <div id="appTitle">
@@ -823,6 +840,51 @@ const char main_html[] PROGMEM = R"rawliteral(
              
                     </div>
                 </div>
+                <div id="apiKeyContainer" class="settingsContainer">
+                    <div class="settingsSubTitle">
+                        <h2>
+                            Sinric Pro Integration
+                        </h2>
+                    </div>
+                    <div id="inputForm" class="settingsItems">
+                        <div>
+                            <label for="sinricUser">Username: </label>
+                            <input type="text" id="sinricUser" type="text" name="sinricUser" />
+                        </div>
+                        <div>
+                            <label for="password">Password: </label>
+                            <input type="password" id="sinricPassword" type="text" name="sinricPassword" />
+                        </div>
+                        <div>
+                            <button type="button" class="controlsButtons" id="loginButton">Submit</button>
+                        </div>
+             
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+        <div id="modalContainer" style="display:none;">
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span id="close" class="close">&times;</span>
+                    <p id="message"></p>
+                    <button type = "button" class="controlsButtons" id="manualForm">Enter Info Manually</button>
+                    <div id="modalFailure" class="modalButtons" style="display:none">
+                        <label for = "appKey" > App Key: </label>
+                        <input type="text" id="appKey" name="appKey" />
+
+                        <label for = "appSecret" > App Secret: </label>
+                        <input class="" type="text" id="appSecret" name="appSecret" />
+
+                        <label for = "deviceID" > Device ID: </label>
+                        <input type="text" id="deviceID" name="deviceID" />
+
+                        <button id="submitCredentials" class="controlsButtons">Submit</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="manualControls" class="appPage" style="display:none;">
@@ -913,7 +975,23 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const mCarHome = document.getElementById('mCarHome');
                 const rPump1 = document.getElementById('rPump1');
                 const rPump2 = document.getElementById('rPump2');
+                const modalContainer = document.getElementById('modalContainer');
+                const modal = document.getElementById('modal');
+                const loginButton = document.getElementById('loginButton');
+                const sinricUser = document.getElementById('sinricUser');
+                const sinricPassword = document.getElementById('sinricPassword');
+                const sinricUrlBase = 'https://api.sinric.pro/api/v1/';
+                const modalClose = document.getElementById('close');
+                const appKey = document.getElementById('appKey');
+                const appSecret = document.getElementById('appSecret');
+                const deviceID = document.getElementById('deviceID');
+                const submitCredentialsButton = document.getElementById('submitCredentials');
+                const modalFailure = document.getElementById('modalFailure');
+                const manualForm = document.getElementById('manualForm');
+                const drink2Container = document.getElementById('drink2Container');
+                const drink3Container = document.getElementById('drink3Container');
                 var websocket;
+
 
                 function onOpen(event) {
                     console.log('Connection opened');
@@ -965,28 +1043,47 @@ const char main_html[] PROGMEM = R"rawliteral(
                         brightness.classList.add('thumb-green');
                         brightness.classList.remove('thumb-blue');
                         setColor();
+                    } else if (message.type == 'expansion') {
+                        if (message.payload == 'duo') {
+                            console.log('Duo expansion detected');
+                        } else {
+                            console.log('Mini site active');
+                            handleExpansionType();
+                        }
+                        
                     }
+                }
+                function handleExpansionType () {
+                    const elements = [
+                        drink2Container,
+                        drink3Container,
+                        rPump2
+                    ];
+                    elements.forEach(element => {
+                        element.style.display = 'none';
+                    });
                 }
 
                 function initWebSocket() {
+                    if (window.location.href.includes('file:///')) {
+                        console.log('Development mode, not opening WebSocket connection');
+                    } else {
                         console.log('Trying to open a WebSocket connection...');
                         websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
                         websocket.onopen = onOpen;
                         websocket.onclose = onClose;
                         websocket.onmessage = onMessage;
+                    }
                 }
 
                 window.addEventListener('load', onLoad, false);
                 function onLoad(event) {
                     initSliders();
-
                 }
-
                 function sendMessage(type, payload) {
-                    const message = { type: type, payload: payload };
+                    const message = { type:  type, payload: payload };
                     websocket.send(JSON.stringify(message));
                 }
-
                 function initButton() {
                     drink1Button.addEventListener('click', function () {
                         sendMessage('pour', { drink: 'drink1', size: p1Range.value });
@@ -1094,12 +1191,263 @@ const char main_html[] PROGMEM = R"rawliteral(
                         const ledNum = document.getElementById('lNum').value;
                         sendMessage('led', { length: ledNum });
                     }, false);
+                    manualForm.addEventListener('click', function () {
+                        manualInputs();
+                        
+                    }, false);
                 }
-                /*
-                function sendData(gateway, data) {
-                    initWebSocket(gateway, data);
+                loginButton.addEventListener('click', function () {
+                        console.log('loginButton clicked');
+                        integrateSinricPro(sinricUser.value, sinricPassword.value);
+
+                    }, false);
+                modalClose.addEventListener('click', function () {
+                    modalContainer.setAttribute('style', 'display: none;');
+                    modal.style.display = 'none';
+                }, false);
+               function jsonToUrlEncoded(obj, prefix) {
+                    let str = [];
+                    for (let p in obj) {
+                        if (obj.hasOwnProperty(p)) {
+                            let k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
+                            str.push((v !== null && typeof v === "object") ?
+                                jsonToUrlEncoded(v, k) :
+                                encodeURIComponent(k) + "=" + encodeURIComponent(v));
+                        }
+                    }
+                    return str.join("&");
                 }
-                */
+                async function sinricProRequest(url, options) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.status == 200) {
+                            let resJson = await response.json();
+                            return resJson;
+                        } else {
+                            const errorMessage = await response.text();
+                            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorMessage}, URL: ${url}`);
+                            
+                        }
+                    } catch(e){
+                        console.log('error: ' + e);
+                    }
+                }
+
+                async function sinricProLogin(username, password) {
+                    let url = sinricUrlBase + 'auth/';
+                    let auth = "Basic " + btoa(username + ":" + password);
+                    let options = {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': auth,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }
+                    const response = await sinricProRequest(url, options);
+                    let accessToken = response.accessToken ?? false;
+                    return accessToken;
+                }
+
+                async function sinricProGetRooms(accessToken) {
+                    let url = sinricUrlBase + 'rooms/'
+                    let options = {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }
+                    const response = await sinricProRequest(url, options);
+                    let rooms = response.rooms ?? false;
+                    return rooms;
+                }
+                async function sinricProGetDevices(accessToken) {
+                    let url = sinricUrlBase + 'devices'
+                    let options = {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }
+                    const response = await sinricProRequest(url, options);
+                    return response;
+                }
+                async function sinricProCreateDevice(accessToken, roomId, productId) {
+                    let data = {
+                        "name":"Servita Bartender",
+                        "description":"Describe",
+                        "productId":productId,
+                        "roomId":roomId
+                    }
+                    let url = sinricUrlBase + 'devices'
+                    let options = {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams(data).toString()
+                        
+                    }
+                    const response = await sinricProRequest(url, options);
+                    return response;
+                }
+
+                async function sinricProCreateDeviceTemplate(accessToken) {
+                    let data = { 
+                        name: "Servita Bartender",
+                        description: "Servita Bartender Device Type",
+                        deviceType: "5ff0b112994fd31b7d5e8065",
+                        capabilities:
+                            [
+                                {
+                                    id: "5ff0b41b994fd31b7d5e8961",
+                                    code: "sinric.capability.mode",
+                                    mode:
+                                        {
+                                            instanceId: "serve-drink",
+                                            locale: "en-US",
+                                            modeName: "pour",
+                                            nonControllable: false,
+                                            modeValues:
+                                                [
+                                                    "drink1",
+                                                    "drink2",
+                                                    "drink3",
+                                                    "cancel"
+                                                ]
+                                        },
+                                    actions:
+                                        [
+                                            "setMode"
+                                        ],
+                                    events:
+                                        [
+                                            "setMode"
+                                        ]
+                                }
+                            ]
+                }
+                    let url = sinricUrlBase + 'devicetemplate';
+                    let options = {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: jsonToUrlEncoded(data)
+                    }
+                    const response = await sinricProRequest(url, options);
+                }
+
+                async function sinricProGetProducts(accessToken) {
+                    let url = sinricUrlBase + 'products'
+                    let options = {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + accessToken,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                        
+                    }
+                    const response = await sinricProRequest(url, options);
+                    return response;
+                }
+
+                function findServita(products) {
+                    let result = [];
+                    products.forEach((product) => {
+                        if (product.name === 'Servita Bartender') {
+                            result.push(product);
+                        }
+                    });
+                    return result;
+                }
+
+                function manualInputs() {
+                    let message = document.getElementById('message');
+                    message.style.display = 'none';
+                    manualForm.style.display = 'none'
+                    modalFailure.style.display = 'block';
+
+                    submitCredentialsButton.addEventListener('click', function () {
+                        let appKey = document.getElementById('appKey').value;
+                        let appSecret = document.getElementById('appSecret').value;
+                        let deviceID = document.getElementById('deviceID').value;
+                        sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceID: deviceID });
+                    })
+                        
+                    
+
+                }
+
+                async function integrateSinricPro(user, pass) {
+                    let sinricInfo = {
+                        appKey: '',
+                        appSecret: '',
+                        deviceId: ''
+                    }
+                    modalContainer.setAttribute('style', 'display: block;');
+                    modal.style.display = 'block';
+                    const message = document.getElementById('message');
+                    message.innerHTML = 'Logging in with Sinric Pro...';
+                    let accessToken = await sinricProLogin(user, pass);
+                    let rooms = await sinricProGetRooms(accessToken);
+                    let templates = await sinricProGetProducts(accessToken);
+                    let devices = await sinricProGetDevices(accessToken);
+                    let defaultRoom = rooms[0].id;
+                    function tdExists (tOrD) {
+                        if (tOrD.length === 0) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    let initTemplates = findServita(templates.products);
+                    if (tdExists(findServita(templates.products)) && tdExists(findServita(devices.devices))) {
+                        message.innerHTML = 'Template and device already exist. If you havent done this before, please press the manaul inputs button.';
+
+                    } else if (tdExists(findServita(templates.products)) && !tdExists(findServita(devices.devices))) {
+                        message.innerHTML = 'Template exists, creating device...';
+                        let createDevice = await sinricProCreateDevice(accessToken, rooms[0].id, initTemplates[0].id);
+                        if (createDevice.success === true) {
+                            let getServita = await sinricProGetDevices(accessToken);
+                            getServita = findServita(getServita.devices);
+                            sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                        } else {
+                            message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
+                        }
+                    } else {
+                        message.innerHTML = 'Creating template...';
+                        let cTResponse = await sinricProCreateDeviceTemplate(accessToken);
+                        let products = await sinricProGetProducts(accessToken);
+                        let servita = findServita(products.products);
+                        if (servita.length === 0) {
+                            mmessage.innerHTML = 'Failed to create template. Click the button below to manually input information after configuring on the Sinric Pro website.';
+                        } else {
+                            message.innerHTML = 'Creating device...';
+                            let checkDevice = findServita(devices.devices);
+                            if (checkDevice.length > 0) {
+                                message.innerHTML = 'Device already exists, you can now exit this menu.';
+                            } else {
+                                let createDevice = await sinricProCreateDevice(accessToken, rooms[0].id, servita[0].id);
+                                if (createDevice.success === true) {
+                                    let getServita = await sinricProGetDevices(accessToken);
+                                    getServita = findServita(getServita.devices);
+                                    sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                                    message.innerHTML = 'Device created successfully! You may now exit this menu.';
+                                } else {
+                                    message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+
+                
                 function p3ValueSafety(pToAdj, pUserAdj) {
                     const sum = parseInt(pUserAdj.value) + parseInt(pToAdj.value);
                     if (sum > 20) {
@@ -1289,7 +1637,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                     drink.innerHTML = name;
                     return console.log('Drink ' + drinkNum + ' name changed to: ', name + '.');
                 }
-                initWebSocket();
+                 initWebSocket();
             </script>
 </body>
 
