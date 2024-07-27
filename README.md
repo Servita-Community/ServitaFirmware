@@ -172,7 +172,12 @@ If your ESP32 board uses the CH340 USB-to-Serial chip, you may need to install t
     arduino-cli core install esp32:esp32@3.0.1
     ```
 
-5. Install Git if it's not already installed:
+5. Install the required Python packages:
+    ```sh
+    pip install pyserial
+    ```
+
+6. Install Git if it's not already installed:
     Download and install Git from the [official Git website](https://git-scm.com/).
 
 #### Mac
@@ -245,9 +250,7 @@ Instead of using the version of `ESPAsyncWebServer` that the Arduino CLI automat
 
 #### Compiling with Arduino CLI
 
-To compile the firmware using the Arduino
-
- CLI, use the following command:
+To compile the firmware using the Arduino CLI, use the following command:
 
 ```sh
 arduino-cli compile --fqbn esp32:esp32:esp32 Servita
@@ -269,6 +272,45 @@ To monitor the serial output of the ESP32, use the following command:
 arduino-cli monitor -p /dev/ttyUSB0 -b esp32:esp32:esp32 -c baudrate=115200
 ```
 
-## Conclusion
+### Using `manufacturing.py`
 
-This refactor improves the Servita project's structure, making it easier to manage and extend. By separating the HTML content and allowing for local testing, developers can more efficiently develop and maintain the web interface for the ESP32 firmware.
+#### Prerequisites
+
+1. Install the `arduino-cli` tool for your operating system.
+
+2. Download the desired firmware version from the [ServitaFirmware releases](https://github.com/Servita-Community/ServitaFirmware/releases).
+
+3. Place the release files into a folder named `build` in the root of the Servita firmware repository.
+
+#### Run
+
+Run the following command:
+
+```sh
+python manufacturing.py --port USB_PORT
+```
+
+Replace `USB_PORT` with the actual USB port where the device is connected.
+
+#### Output Colors
+
+The script will provide output as it goes through various stages. The final output color indicates the configuration status of the device:
+
+| Color   | Description                                                                 |
+|---------|-----------------------------------------------------------------------------|
+| Cyan    | Both the ESP32 and the expansion board have been successfully configured.   |
+| Yellow  | Only the ESP32 main board has been configured.                              |
+| Red     | Neither the main board nor the expansion board were configured properly.    |
+
+If you follow these steps and the output colors, you can easily determine the success of the configuration process.
+
+## Automating Releases
+
+To automate the process of creating a release, you can use GitHub Actions. By tagging a specific commit and pushing to GitHub, a release will be automatically created. To create a release, tag a commit with a version number and push it to GitHub. For example:
+
+```
+git tag v1.0
+git push origin v1.0
+```
+
+This will trigger the GitHub Actions workflow, compile the code, and create a release with the compiled binaries attached.  All versions should be tagged with a 'v' prefix followed by the version number (e.g., `v1.0`, `v1.1`, etc.). The automated release process ensures that new versions of the firmware are easily distributed and reduces the manual effort involved in creating releases.

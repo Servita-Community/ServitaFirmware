@@ -1,16 +1,22 @@
+import argparse
 import subprocess
 import serial
 import time
+import os
+import sys
+
+
+
+# Global Variables
+PORT = "/dev/ttyUSB0"
 
 # Constants
-PORT = '/dev/ttyUSB0'
 BAUDRATE = 115200
 FQBN = 'esp32:esp32:esp32'
-FLASH_COMMAND = ['arduino-cli', 'upload', '-p', PORT, '--fqbn', FQBN, '--input-dir', './build', '--verify']
-MONITOR_COMMAND = ['arduino-cli', 'monitor', '-p', PORT, '-b', FQBN, '-c', f'baudrate={BAUDRATE}']
 
 # Function to flash the board
 def flash_board():
+    FLASH_COMMAND = ['arduino-cli', 'upload', '-p', PORT, '--fqbn', FQBN, '--input-dir', './build', '--verify']
     result = subprocess.run(FLASH_COMMAND)
     return result.returncode == 0
 
@@ -58,6 +64,17 @@ def monitor_serial():
 
 # Main function
 def main():
+    global PORT
+    
+    parser = argparse.ArgumentParser(description='Serial port communication script.')
+    parser.add_argument('--port', type=str, help='COM port to use. E.g., COM3 on Windows or /dev/ttyUSB0 on Linux.', default=None)
+
+    args = parser.parse_args()
+
+    if args.port is not None:
+        PORT = args.port
+
+    
     if not flash_board():
         print("arduino-cli upload failed")
         return
