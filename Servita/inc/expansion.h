@@ -1,3 +1,6 @@
+#ifndef EXPANSION_H
+#define EXPANSION_H
+
 #include <Wire.h>
 #include "inc/pins.h"
 
@@ -16,3 +19,6 @@ void init_expansion();
 expansion_t get_expansion_version();
 void save_expansion_type(expansion_t type);
 void handle_save_expansion_type(String params);
+
+
+#endif // EXPANSION_H

@@ -12,6 +12,7 @@
 #include "inc/pour.h"
 #include "inc/led.h"
 #include "inc/expansion.h"
+#include "inc/sinric.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -152,8 +153,9 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
 
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
-            }
-            else {
+            } else if (strcmp(type, "sinric") == 0) {
+                handle_sinric_json(payload);
+            } else {
                 Serial.println("Unknown message type");
             }
         }

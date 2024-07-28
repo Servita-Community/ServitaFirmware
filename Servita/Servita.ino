@@ -6,6 +6,7 @@
 #include "inc/serial_cmd.h"
 #include "inc/pins.h"
 #include "inc/expansion.h"
+#include "inc/sinric.h"
 #include "Arduino.h"
 
 void setup() {
@@ -21,6 +22,7 @@ void setup() {
   init_serial_commands();
   init_buttons();
   init_server();
+  init_sinric();
 
   Serial.println("Setup complete");
 }
@@ -31,4 +33,5 @@ void loop() {
   button_loop();
   server_loop();
   motor_loop();
+  sinric_loop();
 }
