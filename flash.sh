@@ -8,21 +8,21 @@ if [ $? -ne 0 ]; then
 fi
 
 # Compile with arduino-cli
-arduino-cli compile --fqbn esp32:esp32:esp32 Servita
+arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=default_8MB Servita
 if [ $? -ne 0 ]; then
   echo "arduino-cli compile failed"
   exit 1
 fi
 
 # Upload with arduino-cli
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32 Servita
+arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32:PartitionScheme=default_8MB Servita
 if [ $? -ne 0 ]; then
   echo "arduino-cli upload failed"
   exit 1
 fi
 
 # Monitor with arduino-cli
-arduino-cli monitor -p /dev/ttyUSB0 -b esp32:esp32:esp32 -c baudrate=115200
+arduino-cli monitor -p /dev/ttyUSB0 -b esp32:esp32:esp32:PartitionScheme=default_8MB -c baudrate=115200
 if [ $? -ne 0 ]; then
   echo "arduino-cli monitor failed"
   exit 1
