@@ -13,11 +13,6 @@
 #include <ArduinoJson.h>
 
 extern bool hosted_locally;
-extern void handle_pour_json(JsonObject payload);
-extern void get_sinric_information(bool is_enabled, String *APP_KEY, String *APP_SECRET, String *DEVICE_ID);
-extern void save_sinric_information(const char *app_key, const char *app_secret, const char *device_id);
-extern void delete_sinric_information();
-extern String get_pour_size();
 
 void save_credentials(const char *ssid, const char *pass);
 void delete_credentials();
@@ -27,9 +22,6 @@ bool connect_to_wifi(const char *ssid, const char *pass);
 void handle_net_json(AsyncWebSocketClient *client, JsonObject payload);
 void init_server();
 void server_loop();
-void handle_sinric_json(AsyncWebSocketClient *client, JsonObject payload);
-
-
 
 
 #endif  // SERVER_H

@@ -7,7 +7,7 @@
 
 #include "inc/server.h"
 #include "inc/main_html.h"
-//#include "inc/main_mini_html.h"
+#include "inc/main_mini_html.h"
 #include "inc/motor.h"
 #include "inc/pour.h"
 #include "inc/led.h"
@@ -25,9 +25,6 @@ Preferences wifi_preferences;
 DNSServer local_dns;
 bool hosted_locally = true;
 
-
-
-
 void save_credentials(const char *ssid, const char *pass) {
     wifi_preferences.begin("wifi", false);
     wifi_preferences.putString("ssid", ssid);
@@ -35,12 +32,13 @@ void save_credentials(const char *ssid, const char *pass) {
     wifi_preferences.end();
     Serial.printf("Saved WiFi credentials for ssid: %s\n", ssid);
 }
+
 void delete_credentials() {
     wifi_preferences.begin("wifi", false);
     wifi_preferences.remove("ssid");
     wifi_preferences.remove("pass");
     wifi_preferences.end();
-    Serial.printf("Deleted WiFi credentials");
+    Serial.println("Deleted WiFi credentials");
 }
 
 void get_credentials(String *ssid, String *pass) {
@@ -49,7 +47,7 @@ void get_credentials(String *ssid, String *pass) {
     *pass = wifi_preferences.getString("pass", "");
     wifi_preferences.end();
     if (ssid->length() == 0) {
-        Serial.printf("No WiFi credentials found");
+        Serial.println("No WiFi credentials found");
         return;
     }
     Serial.printf("Retrieved WiFi credentials for ssid: %s\n", ssid->c_str());
@@ -70,12 +68,12 @@ bool connect_to_wifi(const char *ssid, const char *pass) {
     }
 
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.printf("Connected to WiFi!");
+        Serial.println("Connected to WiFi!");
         Serial.print("IP Address: ");
-        //Serial.println(WiFi.localIP());
+        Serial.println(WiFi.localIP());
         return true;
     } else {
-        Serial.printf("Failed to connect to WiFi. Please check credentials.");
+        Serial.println("Failed to connect to WiFi. Please check credentials.");
         WiFi.disconnect();
         return false;
     }
@@ -83,29 +81,24 @@ bool connect_to_wifi(const char *ssid, const char *pass) {
 
 void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
     if (type == WS_EVT_CONNECT) {
-        //Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-        if (expansion_type == DUO_BOARD) {
-            client->text("{'type':'expansion', 'payload':'duo'}");
-        } else {
-            client->text("{'type':'expansion', 'payload':'duo'}");
-        }
+        Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
     } else if (type == WS_EVT_DISCONNECT) {
-        //Serial.printf("WebSocket client #%u disconnected\n", client->id());
+        Serial.printf("WebSocket client #%u disconnected\n", client->id());
     } else if (type == WS_EVT_ERROR) {
-        //Serial.printf("WebSocket client #%u error\n", client->id());
+        Serial.printf("WebSocket client #%u error\n", client->id());
     } else if (type == WS_EVT_DATA) {
         AwsFrameInfo *info = (AwsFrameInfo *)arg;
         if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
             data[len] = 0;
-            //Serial.printf("WebSocket client #%u message: %s\n", client->id(), (char *)data);
+            Serial.printf("WebSocket client #%u message: %s\n", client->id(), (char *)data);
 
             // Parse JSON message
             StaticJsonDocument<512> doc;
             DeserializationError error = deserializeJson(doc, (char*)data);
 
             if (error) {
-                //Serial.print("deserializeJson() failed: ");
-                //Serial.printf(error.c_str());
+                Serial.print("deserializeJson() failed: ");
+                Serial.println(error.c_str());
                 return;
             }
 
@@ -130,7 +123,7 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
             } else if (strcmp(type, "changePourSize") == 0) {
                 const char* drink = payload["drink"];
                 if (drink == nullptr) {
-                    Serial.printf("Missing drink field.");
+                    Serial.println("Missing drink field.");
                     return;
                 }
 
@@ -154,35 +147,17 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                     set_pour_size(MIXED_POUR_1_SIZE, size1);
                     set_pour_size(MIXED_POUR_2_SIZE, size2);
                 } else {
-                    Serial.printf("Unknown drink type.");
+                    Serial.println("Unknown drink type.");
                 }   
 
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
-            } else if (strcmp(type, "sinric") == 0) {
-              
-                handle_sinric_json(client, payload);
-                
             }
             else {
-                Serial.printf("Unknown message type");
+                Serial.println("Unknown message type");
             }
         }
     }
-}
-void handle_sinric_json(AsyncWebSocketClient *client, JsonObject payload) {
-    const char* app_key = payload["app_key"];
-    const char* app_secret = payload["app_secret"];
-    const char* device_id = payload["device_id"];
-
-    if (app_key == nullptr || app_secret == nullptr || device_id == nullptr) {
-        Serial.printf("Invalid Sinric Pro credentials");
-        return;
-    }
-
-    save_sinric_information(app_key, app_secret, device_id);
-    delay(2000);
-    ESP.restart();
 }
 
 void handle_net_json(AsyncWebSocketClient *client, JsonObject payload) {
@@ -190,7 +165,7 @@ void handle_net_json(AsyncWebSocketClient *client, JsonObject payload) {
     const char* pass = payload["password"];
 
     if (ssid == nullptr || pass == nullptr) {
-        Serial.printf("Invalid WiFi credentials");
+        Serial.println("Invalid WiFi credentials");
         return;
     }
 
@@ -208,31 +183,26 @@ void init_server() {
     }
 
     if (hosted_locally) {
-        Serial.printf("Starting Local AP...");
+        Serial.println("Starting Local AP...");
         WiFi.softAP("Servita");
         IPAddress IP = WiFi.softAPIP();
         Serial.print("AP IP address: ");
-        //Serial.println(IP);
+        Serial.println(IP);
         local_dns.start(53, "*", IP);
-        Serial.printf("Local DNS server started...");
+        Serial.println("Local DNS server started...");
     }
 
-    /*
     if (expansion_type == DUO_BOARD) {
-        Serial.printf("Hosting full webserver...");
+        Serial.println("Hosting full webserver...");
         server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send_P(200, "text/html", main_html);
         });
     } else {
-        Serial.printf("Hosting mini webserver...");
+        Serial.println("Hosting mini webserver...");
         server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send_P(200, "text/html", main_mini_html);
         });
     }
-    */
-   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-            request->send_P(200, "text/html", main_html);
-   });
     ws.onEvent(on_ws_event);
     server.addHandler(&ws);
     server.begin();
