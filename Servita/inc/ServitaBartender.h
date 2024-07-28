@@ -3,6 +3,9 @@
 #include <SinricProDevice.h>
 #include <Capabilities/ModeController.h>
 
+#include <SinricProNamespace.h>
+namespace SINRICPRO_NAMESPACE {
+
 /**
  * @brief ServitaBartender class that inherits from SinricProDevice and ModeController
  * 
@@ -17,3 +20,7 @@ public:
 };
 
 extern ServitaBartender *servitaBartender;
+
+} // SINRICPRO_NAMESPACE
+
+using ServitaBartender = SINRICPRO_NAMESPACE::ServitaBartender;

@@ -7,7 +7,7 @@
 #include "inc/pins.h"
 #include "inc/expansion.h"
 #include "inc/sinric.h"
-#include "Arduino.h"
+#include <Arduino.h>
 
 void setup() {
   Serial.begin(115200);

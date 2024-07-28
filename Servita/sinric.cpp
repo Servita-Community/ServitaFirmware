@@ -1,6 +1,12 @@
+#include <SinricPro.h>
 #include "inc/sinric.h"
+#include "inc/ServitaBartender.h"
 #include "inc/pour.h"
-#include "Preferences.h"
+#include <Preferences.h>
+
+#define NDEBUG
+#define NODEBUG_SINRIC
+#define DEBUG_SINRIC(...) Serial.println("Debug Sinric");
 
 Preferences sinric_preferences;
 

@@ -3,10 +3,12 @@
 #ifndef SINRIC_H_
 #define SINRIC_H_
 
+#define NDEBUG
+#define NODEBUG_SINRIC
+#define DEBUG_SINRIC(...) Serial.println("Debug Sinric");
+
 #include <WiFi.h>
 #include <ArduinoJson.h>
-#include <SinricPro.h>
-#include "inc/ServitaBartender.h"
 
 extern String app_key;
 extern String app_secret;
