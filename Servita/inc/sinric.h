@@ -3,10 +3,6 @@
 #ifndef SINRIC_H_
 #define SINRIC_H_
 
-#define NDEBUG
-#define NODEBUG_SINRIC
-#define DEBUG_SINRIC(...) Serial.println("Debug Sinric");
-
 #include <WiFi.h>
 #include <ArduinoJson.h>
 
