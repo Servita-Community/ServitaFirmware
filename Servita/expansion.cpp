@@ -54,7 +54,7 @@ void save_expansion_type(expansion_t type) {
 
     if (Wire.endTransmission() != 0) {
         Serial.println("Error writing to expansion board eeprom");
-        return
+        return;
     }
 
     Serial.printf("Saved expansion type: 0x%x\n", type);
