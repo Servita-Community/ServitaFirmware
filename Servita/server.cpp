@@ -154,7 +154,14 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
             } else if (strcmp(type, "sinric") == 0) {
-                handle_sinric_json(payload);
+              Serial.println('Recieved message for sinric info');
+                const char* appKey = payload["appKey"];
+                const char* deviceId = payload["deviceId"];
+                const char* appSecret = payload["appSecret"];
+                handle_sinric(appKey, appSecret, deviceId);
+                ESP.restart();
+            
+                
             } else {
                 Serial.println("Unknown message type");
             }

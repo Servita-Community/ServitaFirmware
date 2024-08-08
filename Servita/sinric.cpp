@@ -14,19 +14,35 @@ ServitaBartender *servitaBartender = nullptr;
 
 void init_sinric() {
     sinric_preferences.begin("sinric", true);
-    app_key = sinric_preferences.getString("appkey", "");
-    app_secret = sinric_preferences.getString("appsecret", "");
-    device_id = sinric_preferences.getString("deviceid", "");
+    app_key = sinric_preferences.getString("appKey", "");
+    app_secret = sinric_preferences.getString("appSecret", "");
+    device_id = sinric_preferences.getString("deviceId", "");
+
+
     sinric_preferences.end();
 
-    if (servitaBartender != nullptr)    delete servitaBartender;
-    servitaBartender = new ServitaBartender(device_id);
+    if (servitaBartender != nullptr) {
+      delete servitaBartender;
+      servitaBartender = new ServitaBartender(device_id);
+      servitaBartender->onSetMode("serve-drink", on_set_mode);
 
-    servitaBartender->onSetMode("serve-drink", on_set_mode);
+      SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
+      SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
+      SinricPro.begin(app_key, app_secret);
+    } 
+    if (strcmp(app_key.c_str(), "") == 0) {
+      Serial.println("Sinric not yet configured.");
+    } else {
+      delete servitaBartender;
+      servitaBartender = new ServitaBartender(device_id);
+      servitaBartender->onSetMode("serve-drink", on_set_mode);
 
-    SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
-    SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
-    SinricPro.begin(app_key, app_secret);
+      SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
+      SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
+      SinricPro.begin(app_key, app_secret);
+
+    }
+    
 }
 
 bool on_set_mode(const String& deviceId, const String& instance, String &mode) {
@@ -51,24 +67,14 @@ bool on_set_mode(const String& deviceId, const String& instance, String &mode) {
     return true;
 }
 
-void handle_sinric_json(JsonObject payload) {
+void handle_sinric(const char *appKey, const char *appSecret, const char *deviceId) {
+
     sinric_preferences.begin("sinric", false);
 
-    if (payload.containsKey("app_key")) {
-        app_key = payload["app_key"].as<String>();
-        sinric_preferences.putString("appkey", app_key);
-    }
-
-    if (payload.containsKey("app_secret")) {
-        app_secret = payload["app_secret"].as<String>();
-        sinric_preferences.putString("appsecret", app_secret);
-    }
-
-    if (payload.containsKey("device_id")) {
-        device_id = payload["device_id"].as<String>();
-        sinric_preferences.putString("deviceid", device_id);
-    }
-
+    sinric_preferences.putString("appKey", appKey);
+    sinric_preferences.putString("appSecret", appSecret);
+    sinric_preferences.putString("deviceId", deviceId);
+    
     sinric_preferences.end();
 }
 

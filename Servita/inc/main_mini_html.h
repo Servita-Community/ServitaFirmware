@@ -1,4 +1,5 @@
 const char main_mini_html[] PROGMEM = R"rawliteral(
+
 <html>
 
 <head>
@@ -72,13 +73,19 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
             user-select: none; /* Standard syntax */
         }
         .appPage {
-            height: fit-content;
+            /* height: fit-content; */
             width: 100vw;
+            max-height: 90%;
+            margin-top: 2%;
             justify-content: center;
             align-content: center;
             flex-direction: column;
             transition-duration: 300ms;
             flex-grow: 1;
+            /* padding-bottom: 10px; */
+        }
+        #apiKeyContainer {
+            margin-bottom: 2%;
         }
 
         .appView {
@@ -317,6 +324,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
             justify-self: center;
             align-self: center;
             flex-grow: 1;
+            position: relative;
         }
 
         .settingsSubItemsRow {
@@ -527,6 +535,9 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
             }
             h2 {
                 font-size: 1em;
+            }
+            #settings {
+                overflow-y: scroll !important;
             }
 
 
@@ -816,9 +827,9 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                 </div>
                 <div id="numLEDContainer" class="settingsContainer">
                     <div class="settingsSubTitle">
-                        <h3>
+                        <h2>
                             Number Of LEDs
-                        </h3>
+                        </h2>
                     </div>
                     <div id="inputForm" class="settingsItems">
                         <div>
@@ -896,7 +907,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                         <label for = "deviceID" > Device ID: </label>
                         <input type="text" id="deviceID" name="deviceID" />
 
-                        <button id="submitCredentials" class="controlsButtons">Submit</button>
+                        <button type="button" id="submitCredentialsButton" class="controlsButtons">Submit</button>
                     </div>
                 </div>
             </div>
@@ -957,7 +968,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                 const appKey = document.getElementById('appKey');
                 const appSecret = document.getElementById('appSecret');
                 const deviceID = document.getElementById('deviceID');
-                const submitCredentialsButton = document.getElementById('submitCredentials');
+                const submitCredentialsButton = document.getElementById('submitCredentialsButton');
                 const modalFailure = document.getElementById('modalFailure');
                 const manualForm = document.getElementById('manualForm');
                 var websocket;
@@ -1110,6 +1121,16 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                         manualInputs();
                         
                     }, false);
+                    submitCredentialsButton.addEventListener('click', function () {
+                        console.log('manual input button clicked');;
+                        let appKey = document.getElementById('appKey').value;
+                        let appSecret = document.getElementById('appSecret').value;
+                        let deviceID = document.getElementById('deviceID').value;
+                        sendMessage('sinric', { 
+                            appKey: appKey, appSecret: appSecret, deviceID: deviceID 
+                         });
+                         console.log('manual button supposedly sent message')
+                    }, false)
                 }
                 loginButton.addEventListener('click', function () {
                         console.log('loginButton clicked');
@@ -1331,7 +1352,6 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                     }
 
                     let initTemplates = findServita(templates.products);
-                    // Template exists already
                     if (tdExists(findServita(templates.products)) && tdExists(findServita(devices.devices))) {
                         message.innerHTML = 'Template and device already exist. If you havent done this before, please press the manaul inputs button.';
 
@@ -1341,7 +1361,13 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                         if (createDevice.success === true) {
                             let getServita = await sinricProGetDevices(accessToken);
                             getServita = findServita(getServita.devices);
-                            sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                            try {
+                                sendMessage('sinric', { appKey: getServita.device.credential.appkey, appSecret: getServita.device.credential.appkey, deviceId: getServita.device.credential.id });
+                            } catch (e) {
+                                console.log('error: ', e);
+                                console.log(getServita);
+                            }
+                            
                         } else {
                             message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
                         }
@@ -1354,16 +1380,25 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                             mmessage.innerHTML = 'Failed to create template. Click the button below to manually input information after configuring on the Sinric Pro website.';
                         } else {
                             message.innerHTML = 'Creating device...';
+                            console.log(devices);
                             let checkDevice = findServita(devices.devices);
                             if (checkDevice.length > 0) {
                                 message.innerHTML = 'Device already exists, you can now exit this menu.';
                             } else {
                                 let createDevice = await sinricProCreateDevice(accessToken, rooms[0].id, servita[0].id);
+                                console.log(createDevice);
                                 if (createDevice.success === true) {
-                                    let getServita = await sinricProGetDevices(accessToken);
-                                    getServita = findServita(getServita.devices);
-                                    sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                                    
+                                    // successful logic
+                                    let appKey = createDevice.device.credential.appkey;
+                                    console.log(appKey);
+                                    let appSecret = createDevice.device.credential.appsecert ?? createDevice.device.credential.appsecret;
+                                    console.log(appSecret)
+                                    let deviceId = createDevice.device.credential.id;
+                                    console.log(deviceId)
+                                    sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceId: deviceId });
                                     message.innerHTML = 'Device created successfully! You may now exit this menu.';
+
                                 } else {
                                     message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
                                 }
@@ -1371,7 +1406,11 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                             
                         }
                     }
-                }
+
+
+
+                        
+                    }
                 function initSliders() {
                     displaySliderVals();
                     setColor();
@@ -1503,5 +1542,6 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
 </body>
 
 </html>
+
 
 )rawliteral";

@@ -30,7 +30,7 @@ bool on_set_mode(const String& deviceId, const String& instance, String &mode);
  * @brief 
  * 
  */
-void handle_sinric_json(JsonObject payload);
+void handle_sinric(const char *appKey, const char *appSecret, const char *deviceId);
 
 /**
  * @brief 

@@ -78,13 +78,16 @@ const char main_html[] PROGMEM = R"rawliteral(
             user-select: none; 
         }
         .appPage {
-            height: fit-content;
+            /* height: fit-content; */
             width: 100vw;
+            max-height: 90%;
+            margin-top: 2%;
             justify-content: center;
             align-content: center;
             flex-direction: column;
             transition-duration: 300ms;
             flex-grow: 1;
+            /* padding-bottom: 10px; */
         }
 
         .appView {
@@ -259,6 +262,9 @@ const char main_html[] PROGMEM = R"rawliteral(
         #lockUnlockContainer {
             justify-self: center;
             align-self: center;
+        }
+        #apiKeyContainer {
+            margin-bottom: 2%;
         }
 
         #pourMenu {
@@ -882,7 +888,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                         <label for = "deviceID" > Device ID: </label>
                         <input type="text" id="deviceID" name="deviceID" />
 
-                        <button id="submitCredentials" class="controlsButtons">Submit</button>
+                        <button type="button" id="submitCredentialsButton" class="controlsButtons">Submit</button>
                     </div>
                 </div>
             </div>
@@ -985,7 +991,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const appKey = document.getElementById('appKey');
                 const appSecret = document.getElementById('appSecret');
                 const deviceID = document.getElementById('deviceID');
-                const submitCredentialsButton = document.getElementById('submitCredentials');
+                const submitCredentialsButton = document.getElementById('submitCredentialsButton');
                 const modalFailure = document.getElementById('modalFailure');
                 const manualForm = document.getElementById('manualForm');
                 const drink2Container = document.getElementById('drink2Container');
@@ -1195,6 +1201,14 @@ const char main_html[] PROGMEM = R"rawliteral(
                         manualInputs();
                         
                     }, false);
+                    submitCredentialsButton.addEventListener('click', function () {
+                        let appKey = document.getElementById('appKey').value;
+                        let appSecret = document.getElementById('appSecret').value;
+                        let deviceID = document.getElementById('deviceID').value;
+                        sendMessage('sinric', { 
+                            appKey: appKey, appSecret: appSecret, deviceID: deviceID 
+                         });
+                    }, false);
                 }
                 loginButton.addEventListener('click', function () {
                         console.log('loginButton clicked');
@@ -1364,20 +1378,25 @@ const char main_html[] PROGMEM = R"rawliteral(
                     });
                     return result;
                 }
+                
 
                 function manualInputs() {
                     let message = document.getElementById('message');
                     message.style.display = 'none';
                     manualForm.style.display = 'none'
                     modalFailure.style.display = 'block';
-
+                    /*
                     submitCredentialsButton.addEventListener('click', function () {
                         let appKey = document.getElementById('appKey').value;
                         let appSecret = document.getElementById('appSecret').value;
                         let deviceID = document.getElementById('deviceID').value;
-                        sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceID: deviceID });
+                        sendMessage({type: 'sinric', payload: { 
+                            appKey: appKey, appSecret: appSecret, deviceID: deviceID 
+                         }});
+                         
                     })
-                        
+                       
+                     */   
                     
 
                 }
@@ -1415,7 +1434,13 @@ const char main_html[] PROGMEM = R"rawliteral(
                         if (createDevice.success === true) {
                             let getServita = await sinricProGetDevices(accessToken);
                             getServita = findServita(getServita.devices);
-                            sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                            try {
+                                sendMessage('sinric', { appKey: getServita.device.credential.appkey, appSecret: getServita.device.credential.appkey, deviceId: getServita.device.credential.id });
+                            } catch (e) {
+                                console.log('error: ', e);
+                                console.log(getServita);
+                            }
+                            
                         } else {
                             message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
                         }
@@ -1428,16 +1453,25 @@ const char main_html[] PROGMEM = R"rawliteral(
                             mmessage.innerHTML = 'Failed to create template. Click the button below to manually input information after configuring on the Sinric Pro website.';
                         } else {
                             message.innerHTML = 'Creating device...';
+                            console.log(devices);
                             let checkDevice = findServita(devices.devices);
                             if (checkDevice.length > 0) {
                                 message.innerHTML = 'Device already exists, you can now exit this menu.';
                             } else {
                                 let createDevice = await sinricProCreateDevice(accessToken, rooms[0].id, servita[0].id);
+                                console.log(createDevice);
                                 if (createDevice.success === true) {
-                                    let getServita = await sinricProGetDevices(accessToken);
-                                    getServita = findServita(getServita.devices);
-                                    sendMessage('sinric', { appKey: getServita.accessKey.appkey, appSecret: getServita.accessKey.appsecret, deviceId: getServita.id });
+                                    
+                                    // successful logic
+                                    let appKey = createDevice.device.credential.appkey;
+                                    console.log(appKey);
+                                    let appSecret = createDevice.device.credential.appsecert ?? createDevice.device.credential.appsecret;
+                                    console.log(appSecret)
+                                    let deviceId = createDevice.device.credential.id;
+                                    console.log(deviceId)
+                                    sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceId: deviceId });
                                     message.innerHTML = 'Device created successfully! You may now exit this menu.';
+
                                 } else {
                                     message.innerHTML = 'Failed to create device. Click the button below to manually input information after configuring on the Sinric Pro website.';
                                 }
@@ -1445,9 +1479,12 @@ const char main_html[] PROGMEM = R"rawliteral(
                             
                         }
                     }
-                }
 
-                
+
+
+                        
+                    }
+               
                 function p3ValueSafety(pToAdj, pUserAdj) {
                     const sum = parseInt(pUserAdj.value) + parseInt(pToAdj.value);
                     if (sum > 20) {
