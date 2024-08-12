@@ -116,6 +116,15 @@ This will generate the `main_html.h` file in the `Servita/inc` directory.
    - **Windows**: `C:\Users\<YourUsername>\Documents\Arduino\libraries`
    - **Linux**: `~/Arduino/libraries`
 
+#### Installing SinricPro
+1. Copy this link into your browser: [SinricPro Version 3.2.1 ZIP](https://github.com/sinricpro/esp8266-esp32-sdk/archive/refs/tags/3.2.1.zip)
+2. Save the ZIP file to your computer.
+3. Extract the ZIP file.
+4. Move the extracted folder to your Arduino libraries directory:
+   - **Windows**: `C:\Users\<YourUsername>\Documents\Arduino\libraries`
+   - **Linux**: `~/Arduino/libraries`
+5. Rename the folder to `SinricPro`.
+
 #### Installing CH340 Drivers
 
 If your ESP32 board uses the CH340 USB-to-Serial chip, you may need to install the CH340 drivers:
@@ -235,15 +244,31 @@ Instead of using the version of `ESPAsyncWebServer` that the Arduino CLI automat
     cd C:\Users\<YourUsername>\Documents\Arduino\libraries
     ```
 
-3. Clone the `ESPAsyncWebServer` repository:
+3. Clone the `ESPAsyncWebServer` repository and checkout the latest supported version (v3.0.6):
     ```sh
     git clone https://github.com/mathieucarbou/ESPAsyncWebServer.git
-    ```
-
-4. Checkout the latest supported version (v3.0.6):
-    ```sh
     cd ESPAsyncWebServer
     git checkout v3.0.6
+    ```
+
+#### Cloning `SinricPro`
+1. Navigate to your Arduino libraries folder. The default locations are:
+    - **Linux**: `~/Arduino/libraries`
+    - **Windows**: `C:\Users\<YourUsername>\Documents\Arduino\libraries`
+    - **Mac**: `~/Documents/Arduino/libraries`
+
+2. Open a terminal (or command prompt) and navigate to the Arduino libraries folder:
+    ```sh
+    cd ~/Arduino/libraries
+    # or for Windows
+    cd C:\Users\<YourUsername>\Documents\Arduino\libraries
+    ```
+
+3. Clone the 'SinricPro' repository and checkout the latest supported version (3.2.1):
+    ```sh
+    git clone https://github.com/sinricpro/esp8266-esp32-sdk.git SinricPro
+    cd SinricPro
+    git checkout 3.2.1
     ```
 
 ### Compilation and Upload

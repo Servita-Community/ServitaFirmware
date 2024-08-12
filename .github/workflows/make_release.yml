@@ -46,6 +46,13 @@ jobs:
           cd ESPAsyncWebServer
           git checkout v3.0.6
       
+      - name: Install SinricPro
+        run: |
+          cd $HOME/Arduino/libraries
+          git clone https://github.com/sinricpro/esp8266-esp32-sdk.git SinricPro
+          cd SinricPro
+          git checkout v3.2.1
+      
       - name: Install pyserial
         run: pip install pyserial
 
