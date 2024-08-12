@@ -61,7 +61,7 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/build
           cd $GITHUB_WORKSPACE
           python3 export_html.py
-          arduino-cli compile --fqbn esp32:esp32:esp32 Servita --output-dir ./build
+          arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=huge_app Servita --output-dir ./build
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
