@@ -12,7 +12,7 @@
 #include "inc/pour.h"
 #include "inc/led.h"
 #include "inc/expansion.h"
-#include "inc/sinric.h"
+// #include "inc/sinric.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -56,6 +56,8 @@ void get_credentials(String *ssid, String *pass) {
 
 bool connect_to_wifi(const char *ssid, const char *pass) {
     WiFi.setHostname("servita.local");
+    WiFi.setSleep(false);
+    WiFi.setAutoReconnect(true);
     WiFi.begin(ssid, pass);
 
     Serial.print("Connecting to WiFi..");
@@ -153,15 +155,10 @@ void on_ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventT
 
                 String pourSizes = get_pour_size();
                 client->text(pourSizes);
+            /*
             } else if (strcmp(type, "sinric") == 0) {
-              Serial.println('Recieved message for sinric info');
-                const char* appKey = payload["appKey"];
-                const char* deviceId = payload["deviceId"];
-                const char* appSecret = payload["appSecret"];
-                handle_sinric(appKey, appSecret, deviceId);
-                ESP.restart();
-            
-                
+                handle_sinric_json(payload);
+            */
             } else {
                 Serial.println("Unknown message type");
             }

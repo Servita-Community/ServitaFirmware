@@ -8,33 +8,37 @@
 #include "inc/expansion.h"
 #include "inc/sinric.h"
 #include <Arduino.h>
+#include <SinricPro.h>
+#include "inc/ServitaBartender.h"
+
 
 void setup() {
   Serial.begin(115200);
   delay(100);
   set_pins_based_on_board_version();
-  Serial.println("pins success");
   init_expansion();
-  Serial.println("expansion success");
   init_leds();
-  Serial.println("led success");
   init_limit_switches();
-  Serial.println("limit switch success");
   init_motors();
-  Serial.println("motor success");
   init_pour_system();
-  Serial.println("pour success");
-  Serial.println("commands");
   init_serial_commands();
-  Serial.println("commands success");
   init_buttons();
-  Serial.println("buttons success");
   init_server();
-  Serial.println("server success");
   init_sinric();
-  Serial.println("sinric Success");
 
-  Serial.println("Setup complete");
+    // ModeController
+  if (valid_sinric_credentials()) {
+    ServitaBartender &servitaBartender = SinricPro[device_id];
+    servitaBartender.onSetMode("serve-drink", on_set_mode);
+
+    SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
+    SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
+    SinricPro.begin(app_key, app_secret);
+
+    Serial.println("Sinric credentials valid... initializing...");
+  } else {
+    Serial.println("Sinric credentials not valid... skipping initialization...");
+  }
 }
 
 void loop() {
@@ -43,5 +47,5 @@ void loop() {
   button_loop();
   server_loop();
   motor_loop();
-  sinric_loop();
+  SinricPro.handle();
 }

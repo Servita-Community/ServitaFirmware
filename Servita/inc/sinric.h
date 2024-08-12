@@ -12,6 +12,12 @@ extern String device_id;
 
 /**
  * @brief 
+ * 
+ */
+bool valid_sinric_credentials();
+
+/**
+ * @brief 
  */
 void init_sinric();
 
@@ -30,12 +36,6 @@ bool on_set_mode(const String& deviceId, const String& instance, String &mode);
  * @brief 
  * 
  */
-void handle_sinric(const char *appKey, const char *appSecret, const char *deviceId);
-
-/**
- * @brief 
- * 
- */
-void sinric_loop();
+void handle_sinric_json(JsonObject payload);
 
 #endif // SINRIC_H_

@@ -1411,6 +1411,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
 
                         
                     }
+               
                 function initSliders() {
                     displaySliderVals();
                     setColor();
