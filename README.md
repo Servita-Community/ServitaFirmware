@@ -107,7 +107,6 @@ This will generate the `main_html.h` file in the `Servita/inc` directory.
     - `AsyncTCP` version `1.1.4`
     - `ArduinoJson` version `7.0.4`
     - `WebSockets` version `2.5.1`
-    - `NetworkClientSecure` version `2.0.0`
 
 #### Installing ESPAsyncWebServer
 
@@ -239,7 +238,6 @@ arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
 arduino-cli lib install "ArduinoJson@7.0.4"
 arduino-cli lib install "WebSockets@2.5.1"
-arduino-cli lib install "NetworkClientSecure@2.0.0"
 ```
 
 #### Cloning `ESPAsyncWebServer`
@@ -310,6 +308,55 @@ To monitor the serial output of the ESP32, use the following command:
 ```sh
 arduino-cli monitor -p /dev/ttyUSB0 -b esp32:esp32:esp32 -c baudrate=115200
 ```
+
+## Setup Instructions for Integrating Sinric Pro with Alexa and Servita
+
+### Step 1: Create an Account on Sinric Pro
+1. Visit the Sinric Pro website: [sinric.pro](https://sinric.pro)
+2. Click on the "Sign Up" or "Create Account" button.
+3. Fill in the required details, such as your name, email address, and password.
+4. Confirm your email address by clicking on the verification link sent to your inbox.
+
+### Step 2: Download the Sinric Pro App
+1. Open the App Store (iOS) or Google Play Store (Android) on your mobile device.
+2. Search for "Sinric Pro".
+3. Download and install the Sinric Pro app.
+
+### Step 3: Link Your Sinric Pro Account with Alexa
+1. Open the Sinric Pro app on your mobile device.
+2. Log in using the account credentials you created in Step 1.
+3. Follow the in-app instructions to link your Sinric Pro account with Alexa.
+
+### Step 4: Access the Settings Page in the Servita Web App
+1. Open your web browser and navigate to the Servita web app.
+2. Log in to your Servita account if prompted.
+
+### Step 5: Log in to Sinric Pro in the Servita Integration Box
+1. In the Servita web app, go to the "Settings" page.
+2. Locate the Sinric Pro integration box.
+3. Enter your Sinric Pro account email and password to log in and authorize the integration.
+
+### Step 6: Add Servita as a Device in the Alexa App
+1. Open the Alexa app on your mobile device.
+2. If Servita has not been added automatically, go to "Devices" and tap the "+" icon to add a new device.
+3. Follow the prompts to add Servita as a new device.
+
+### Step 7: Create Routines for Your Device
+1. In the Alexa app, go to the "Routines" section.
+2. Tap the "+" icon to create a new routine.
+3. Set up routines with the following values:
+   - Routine 1: "Drink1"
+   - Routine 2: "Drink2"
+   - Routine 3: "Drink3"
+   - Routine 4: "Cancel"
+4. Configure each routine according to your preferences and save them.
+
+### Step 8: Test Alexa with Servita
+1. Use voice commands to test each routine you created.
+2. Say, "Alexa, trigger [routine name]" (e.g., "Alexa, trigger Drink1").
+3. Ensure that Alexa responds correctly and performs the desired action with your Servita device.
+
+Congratulations! You have successfully set up and integrated Sinric Pro with Alexa and Servita. Enjoy your smart home automation!
 
 ### Using `manufacturing.py`
 
