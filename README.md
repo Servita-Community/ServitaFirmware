@@ -103,9 +103,11 @@ This will generate the `main_html.h` file in the `Servita/inc` directory.
 1. Open the Arduino IDE.
 2. Go to `Tools` > `Manage Libraries`.
 3. In the Library Manager, search for and install the following libraries:
-   - `FastLED` version `3.7.0`
-   - `AsyncTCP` version `1.1.4`
-   - `ArduinoJson` version `7.0.4`
+    - `FastLED` version `3.7.0`
+    - `AsyncTCP` version `1.1.4`
+    - `ArduinoJson` version `7.0.4`
+    - `WebSockets` version `2.5.1`
+    - `NetworkClientSecure` version `2.0.0`
 
 #### Installing ESPAsyncWebServer
 
@@ -236,6 +238,8 @@ This partition scheme is recommended for devices with 8 MB of flash space, as it
 arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
 arduino-cli lib install "ArduinoJson@7.0.4"
+arduino-cli lib install "WebSockets@2.5.1"
+arduino-cli lib install "NetworkClientSecure@2.0.0"
 ```
 
 #### Cloning `ESPAsyncWebServer`
