@@ -51,7 +51,7 @@ jobs:
           cd $HOME/Arduino/libraries
           git clone https://github.com/sinricpro/esp8266-esp32-sdk.git SinricPro
           cd SinricPro
-          git checkout v3.2.1
+          git checkout 3.2.1
       
       - name: Install pyserial
         run: pip install pyserial
