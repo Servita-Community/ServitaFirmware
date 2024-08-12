@@ -133,6 +133,16 @@ If your ESP32 board uses the CH340 USB-to-Serial chip, you may need to install t
 - **Mac**: Download and install the driver from the [official CH340 driver page](http://www.wch.cn/downloads/CH341SER_MAC_ZIP.html).
 - **Linux**: Most modern Linux distributions include the CH340 driver by default. If not, you can install it using your package manager.
 
+#### Setting the Partition Scheme
+
+When using the Arduino IDE to install the firmware on an ESP32 device, it is important to select the correct partition scheme to ensure that there is enough space for the application.
+
+1. Open the Arduino IDE.
+2. Go to `Tools` > `Partition Scheme`.
+3. Select `Huge APP (3MB No OTA/1MB SPIFFS)` from the dropdown menu.
+
+This partition scheme is recommended for devices with 8 MB of flash space, as it allocates a large portion of the memory for the application, ensuring that it can run without issues related to memory limitations.
+
 ### Using Arduino CLI
 
 #### Linux
