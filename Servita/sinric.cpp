@@ -112,5 +112,7 @@ void handle_sinric_json(JsonObject payload) {
 }
 
 void sinric_loop() {
-    SinricPro.handle();
+    if (valid_sinric_credentials()) {
+        SinricPro.handle();
+    }
 }
