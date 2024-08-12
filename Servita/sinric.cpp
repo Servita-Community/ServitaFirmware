@@ -1,6 +1,8 @@
 #include "inc/sinric.h"
 #include "inc/pour.h"
 #include <Preferences.h>
+#include <SinricPro.h>
+#include "inc/ServitaBartender.h"
 
 Preferences sinric_preferences;
 
@@ -21,6 +23,19 @@ void init_sinric() {
 
     if (app_key.length() == 0 || app_secret.length() == 0 || device_id.length() == 0) {
         return;
+    }
+
+    if (valid_sinric_credentials()) {
+        ServitaBartender &servitaBartender = SinricPro[device_id];
+        servitaBartender.onSetMode("serve-drink", on_set_mode);
+
+        SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
+        SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
+        SinricPro.begin(app_key, app_secret);
+
+        Serial.println("Sinric credentials valid... initializing...");
+    } else {
+        Serial.println("Sinric credentials not valid... skipping initialization...");
     }
 }
 
@@ -94,4 +109,8 @@ void handle_sinric_json(JsonObject payload) {
     }
 
     Serial.println("Sinric credentials updated, but not valid... Skipping restart...");
+}
+
+void sinric_loop() {
+    SinricPro.handle();
 }

@@ -8,8 +8,6 @@
 #include "inc/expansion.h"
 #include "inc/sinric.h"
 #include <Arduino.h>
-#include <SinricPro.h>
-#include "inc/ServitaBartender.h"
 
 
 void setup() {
@@ -25,20 +23,6 @@ void setup() {
   init_buttons();
   init_server();
   init_sinric();
-
-    // ModeController
-  if (valid_sinric_credentials()) {
-    ServitaBartender &servitaBartender = SinricPro[device_id];
-    servitaBartender.onSetMode("serve-drink", on_set_mode);
-
-    SinricPro.onConnected([]{ Serial.printf("[SinricPro]: Connected\r\n"); });
-    SinricPro.onDisconnected([]{ Serial.printf("[SinricPro]: Disconnected\r\n"); });
-    SinricPro.begin(app_key, app_secret);
-
-    Serial.println("Sinric credentials valid... initializing...");
-  } else {
-    Serial.println("Sinric credentials not valid... skipping initialization...");
-  }
 }
 
 void loop() {
@@ -47,5 +31,5 @@ void loop() {
   button_loop();
   server_loop();
   motor_loop();
-  SinricPro.handle();
+  sinric_loop();
 }

@@ -38,4 +38,6 @@ bool on_set_mode(const String& deviceId, const String& instance, String &mode);
  */
 void handle_sinric_json(JsonObject payload);
 
+void sinric_loop();
+
 #endif // SINRIC_H_
