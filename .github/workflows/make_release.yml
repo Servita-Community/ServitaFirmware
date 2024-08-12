@@ -35,6 +35,8 @@ jobs:
           arduino-cli lib install "FastLED@3.7.0"
           arduino-cli lib install "AsyncTCP@1.1.4"
           arduino-cli lib install "ArduinoJson@7.0.4"
+          arduino-cli lib install "WebSockets@2.5.1"
+          arduino-cli lib install "NetworkClientSecure@2.0.0"
 
       - name: Install Git
         run: sudo apt-get install -y git
