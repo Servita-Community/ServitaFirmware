@@ -39,6 +39,14 @@ enum motor_type_t {
     GANTRY,
 };
 
+enum gantry_state_t {
+    GANTRY_NONE,
+    GANTRY_HOMING,
+    GANTRY_POURING,
+    GANTRY_MANUAL_UP,
+    GANTRY_MANUAL_DOWN
+};
+
 typedef struct {
     uint8_t *high_pin;  // High side for the pumps, up driver for the gantry.
     uint8_t *low_pin;  // Low side for the pumps, down driver for the gantry.
@@ -50,6 +58,7 @@ typedef struct {
 extern motor_t pump1;
 extern motor_t pump2;
 extern motor_t gantry;
+extern gantry_state_t gantry_state;
 
 
 /**
@@ -64,6 +73,19 @@ void init_limit_switches();
  * @return void
  */
 void init_motor(motor_t *motor);
+
+/**
+ * @brief 
+ * 
+ * @param state 
+ */
+void manual_gantry_control(motor_state_t state);
+
+/**
+ * @brief 
+ * 
+ */
+void home_gantry();
 
 /**
  * @brief Initialize all motors.

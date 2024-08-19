@@ -26,9 +26,9 @@ serial_command_t serial_commands[] = {
             Serial.printf("Mixed 2: %u ms\n", mixed2_pour_size);
         }
     }},
-    {"down", [](String params){ set_motor_state(&gantry, MOTOR_DOWN); }},
-    {"up", [](String params){ set_motor_state(&gantry, MOTOR_UP); }},
-    {"stop", [](String params){ set_motor_state(&gantry, MOTOR_OFF); }},
+    {"down", [](String params){ manual_gantry_control(MOTOR_DOWN); }},
+    {"up", [](String params){ manual_gantry_control(MOTOR_UP); }},
+    {"stop", [](String params){ manual_gantry_control(MOTOR_OFF); }},
     {"cancel", [](String params){ abort_pour(); }},
     {"restart", [](String params){ ESP.restart(); }},
     {"deleteCredentials", [](String params){ delete_credentials(); }},

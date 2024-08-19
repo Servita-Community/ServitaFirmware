@@ -104,6 +104,7 @@ void start_pour(drink_t drink) {
         drink == DRINK2 ? RGB::POUR_DRINK_2_COLOR : RGB::POUR_DRINK_MIXED_COLOR
     );
     drink_pour.state = GANTRY_DECENDING;
+    gantry_state = GANTRY_POURING;
     Serial.printf("Starting pour for drink: %d\n", drink);
 }
 
@@ -167,6 +168,7 @@ void pour_seq_loop() {
         case GANTRY_ASCENDING:
             if (digitalRead(LIMIT_SWITCH_TOP) == LOW) {
                 drink_pour.state = IDLE;
+                gantry_state = GANTRY_NONE;
                 set_board_color(hosted_locally ? RGB::LOCAL_WEBSERVER_COLOR : RGB::EXTERNAL_WEBSERVER_COLOR);
                 Serial.println("Gantry up all done switching to idle.");
             } else {
