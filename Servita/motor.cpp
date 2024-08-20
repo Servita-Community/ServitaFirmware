@@ -42,7 +42,7 @@ void manual_gantry_control(motor_state_t state) {
 
     switch (gantry_state) {
         case GANTRY_HOMING:
-            Serial.println("Cannot manually control gantry while homing.");                 return;
+            Serial.println("Homing canceled for manual movement.");                         break;
         case GANTRY_POURING:
             Serial.println("Cannot manually control gantry while pouring.");                return;
         case GANTRY_MANUAL_UP:
