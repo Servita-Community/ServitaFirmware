@@ -32,8 +32,16 @@ jobs:
           if ! git diff --quiet; then
             git config --global user.name "GitHub Actions"
             git config --global user.email "actions@github.com"
+            
+            # Commit the version change
             git commit -am "Update SOFTWARE_VERSION to $VERSION"
-            git tag -f $VERSION
+            
+            # Delete the tag locally and remotely if it exists
+            git tag -d $VERSION || true
+            git push origin :refs/tags/$VERSION || true
+            
+            # Recreate and push the new tag
+            git tag $VERSION
             git push origin --tags
           fi
 
