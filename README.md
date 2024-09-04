@@ -392,11 +392,45 @@ If you follow these steps and the output colors, you can easily determine the su
 
 ## Automating Releases
 
-To automate the process of creating a release, you can use GitHub Actions. By tagging a specific commit and pushing to GitHub, a release will be automatically created. To create a release, tag a commit with a version number and push it to GitHub. For example:
+The Servita project uses an automated release process powered by GitHub Actions. This process ensures that new firmware versions are easily distributed with minimal manual effort. When you tag a commit with a version number and push it to GitHub, the following steps are automatically executed:
 
-```
-git tag v1.0
-git push origin v1.0
-```
+1. **Version Check**: The workflow checks that the `SOFTWARE_VERSION` in the code (`version.h`) matches the version tag used for the release.
+2. **Compilation**: The firmware is compiled using the latest code.
+3. **Release Creation**: A GitHub release is created, and the compiled binaries are attached.
 
-This will trigger the GitHub Actions workflow, compile the code, and create a release with the compiled binaries attached.  All versions should be tagged with a 'v' prefix followed by the version number (e.g., `v1.0`, `v1.1`, etc.). The automated release process ensures that new versions of the firmware are easily distributed and reduces the manual effort involved in creating releases.
+### Steps for Releasing a New Version
+
+To release a new version, follow these steps:
+
+1. **Update the Software Version**:
+   Manually update the `SOFTWARE_VERSION` constant in `Servita/inc/version.h` to match the version you intend to release. For example, if you're releasing version `v1.1`, update the line in `version.h` like this:
+
+   ```cpp
+   #define SOFTWARE_VERSION "v1.1"
+   ```
+
+   This ensures that the version number in the code matches the release tag.
+
+2. **Tag the Release**:
+   Use the following Git commands to tag the release and push it to GitHub:
+
+   ```bash
+   git tag v1.1
+   git push origin v1.1
+   ```
+
+   The tag should have a 'v' prefix followed by the version number (e.g., `v1.1`, `v2.0`). This triggers the GitHub Actions workflow to compile the code and create the release with the appropriate binaries.
+
+### Automatic Version Update
+
+If you forget to update the `SOFTWARE_VERSION` in `version.h` before tagging a release, the GitHub Actions workflow will automatically correct this:
+
+- The workflow checks if the `SOFTWARE_VERSION` in `version.h` matches the version tag (e.g., `v1.1`).
+- If there's a mismatch, the workflow updates the `SOFTWARE_VERSION` to match the version tag.
+- A new commit with the correct version is created on the tagged release, and the old tag is replaced with the updated one.
+
+### Important Notes
+
+- **Version Mismatch Handling**: If the `SOFTWARE_VERSION` in the code doesn’t match the version tag, the workflow will adjust the version number and create a commit on the release tag, not on the `main` branch. This keeps the main codebase unaffected unless you decide to merge the changes manually.
+  
+- **Avoiding Unnecessary Commits**: By manually updating the `SOFTWARE_VERSION` in `version.h` before tagging, you prevent the workflow from creating additional commits, resulting in a cleaner release process.
