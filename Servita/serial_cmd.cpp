@@ -37,6 +37,7 @@ serial_command_t serial_commands[] = {
     {"getExpansionType", [](String params){get_expansion_version(); }},
     {"saveExpansionType", handle_save_expansion_type},
     {"setBoardLed", handle_set_board_led},
+    {"version", [](String params){ Serial.printf("Software version: %s\n", SOFTWARE_VERSION); }}
 };
 
 // Number of commands
