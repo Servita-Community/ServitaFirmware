@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     tags:
-      - "v*" # Only run on version branches
+      - "v*" # Only run on version tags
 
 permissions:
   contents: write
@@ -20,6 +20,22 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+
+      - name: Extract tag version
+        id: get_version
+        run: echo "::set-output name=VERSION::${GITHUB_REF#refs/tags/}"
+
+      - name: Update SOFTWARE_VERSION in version.h
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          sed -i "s/#define SOFTWARE_VERSION \".*\"/#define SOFTWARE_VERSION \"$VERSION\"/" Servita/inc/version.h
+          if ! git diff --quiet; then
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git commit -am "Update SOFTWARE_VERSION to $VERSION"
+            git tag -f $VERSION
+            git push origin --tags
+          fi
 
       - name: Install Arduino CLI
         run: |
