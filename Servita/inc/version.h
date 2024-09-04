@@ -1,14 +1,16 @@
 /**
- * @file brd_version.h
+ * @file version.h
  * @brief Board version information.
  * @version 0.1
  * @date 2024-07-05
 */
 
-#ifndef BRD_VERSION_H
-#define BRD_VERSION_H
+#ifndef VERSION_H
+#define VERSION_H
 
 #include <Arduino.h>
+
+#define SOFTWARE_VERSION "0.1"
 
 extern String board_version;
 
@@ -18,4 +20,4 @@ unsigned long hashString(const String &str);
 void handle_save_brd_version(String params);
 
 
-#endif  // BRD_VERSION_H
+#endif  // VERSION_H

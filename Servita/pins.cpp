@@ -6,7 +6,7 @@
 */
 
 #include "inc/pins.h"
-#include "inc/brd_version.h"
+#include "inc/version.h"
 
 // Define default pin values (Compatible with v1.0 board)
 uint8_t SDA_PIN = 21;

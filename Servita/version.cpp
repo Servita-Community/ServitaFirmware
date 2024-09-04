@@ -1,11 +1,11 @@
 /**
- * @file brd_version.cpp
+ * @file version.cpp
  * @brief Board version information.
  * @version 0.1
  * @date 2024-07-05
 */
 
-#include "inc/brd_version.h"
+#include "inc/version.h"
 #include <Preferences.h>
 
 Preferences board_prefs;

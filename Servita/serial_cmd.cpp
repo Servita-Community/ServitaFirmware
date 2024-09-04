@@ -9,7 +9,7 @@
 #include "inc/motor.h"
 #include "inc/pour.h"
 #include "inc/server.h"
-#include "inc/brd_version.h"
+#include "inc/version.h"
 #include "inc/led.h"
 #include "inc/expansion.h"
 

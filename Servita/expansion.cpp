@@ -1,5 +1,5 @@
 #include "inc/expansion.h"
-#include "inc/brd_version.h"
+#include "inc/version.h"
 
 
 expansion_t expansion_type = NO_EXPANSION;
