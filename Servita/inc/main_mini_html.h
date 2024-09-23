@@ -1362,7 +1362,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                             let getServita = await sinricProGetDevices(accessToken);
                             getServita = findServita(getServita.devices);
                             try {
-                                sendMessage('sinric', { appKey: getServita.device.credential.appkey, appSecret: getServita.device.credential.appkey, deviceId: getServita.device.credential.id });
+                                sendMessage('sinric', { appKey: getServita.device.credential.appkey, appSecret: getServita.device.credential.appkey, deviceID: getServita.device.credential.id });
                             } catch (e) {
                                 console.log('error: ', e);
                                 console.log(getServita);
@@ -1396,7 +1396,7 @@ const char main_mini_html[] PROGMEM = R"rawliteral(
                                     console.log(appSecret)
                                     let deviceId = createDevice.device.credential.id;
                                     console.log(deviceId)
-                                    sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceId: deviceId });
+                                    sendMessage('sinric', { appKey: appKey, appSecret: appSecret, deviceID: deviceId });
                                     message.innerHTML = 'Device created successfully! You may now exit this menu.';
 
                                 } else {

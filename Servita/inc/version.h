@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 
-#define SOFTWARE_VERSION "v2.3"
+#define SOFTWARE_VERSION "v2.4"
 
 extern String board_version;
 
