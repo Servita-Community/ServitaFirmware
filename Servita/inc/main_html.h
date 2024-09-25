@@ -533,6 +533,10 @@ const char main_html[] PROGMEM = R"rawliteral(
                 font-size: 1em;
             }
 
+            #settings {
+                overflow-y: scroll !important;
+            }
+
 
         }
 
