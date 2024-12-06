@@ -718,32 +718,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                         </div>
                     </div>
                 </div>
-                <div class="settingsItems">
-                    <div id="drink2Container" class="settingsSubItemsCol">
-                        <button type="button" class="controlsButtons" id="drink2" style="width: 80%!important;">Drink 2
-                        </button>
-                        <div class="slidecontainer">
-                            <label id="p2ValDisplay" for="p2Range">Pour Size: </label>
-                            <input name="p2Range" type="range" min="0" max="20" value="" class="thumb-blue" id="p2Range">
-                        </div>
-                    </div>
-                </div>
-                <div class="settingsItems">
-                    <div id="drink3Container" class="settingsSubItemsCol">
-                        <button type="button" class="controlsButtons" id="drink3" style="width: 80%!important;">Drink 3
-                        </button>
-                        <div class="slidecontainer">
-                            <label id="p3Val1Display" for="p3Range1">Pump 1 Amount: </label>
-                            <input name="p3Range1" type="range" min="0" max="20" value="" class="thumb-blue"
-                                id="p3Range1">
-                        </div>
-                        <div class="slidecontainer">
-                            <label id="p3Val2Display" for="p3Range2">Pump 2 Amount: </label>
-                            <input name="p3Range2" type="range" min="0" max="20" value="" class="thumb-blue"
-                                id="p3Range2">
-                        </div>
-                    </div>
-                </div>
                 <div id="cancelContainer" class="settingsSubItemsCol">
                     <button type="button" class="controlsButtons" id="cancel">Cancel
                         Pour</button>
@@ -922,8 +896,7 @@ const char main_html[] PROGMEM = R"rawliteral(
                 </div>
                 
                 <div>
-                    <button id="rPump2" type="button" class="controlsButtons">Run Pump
-                        2</button>
+                    <button id="rPump2" type="button" class="controlsButtons">Toggle Drawer</button>
                 </div>
                 
             </div>
@@ -948,20 +921,10 @@ const char main_html[] PROGMEM = R"rawliteral(
             </div>
             <script type="text/javascript">
                 const drink1Button = document.getElementById('drink1');
-                const drink2Button = document.getElementById('drink2');
-                const drink3Button = document.getElementById('drink3');
                 const cancelButton = document.getElementById('cancel');
                 const drink1Label = document.getElementById('d1Label');
-                const drink2Label = document.getElementById('d2Label');
-                const drink3Label = document.getElementById('d3Label');
                 const p1ValDisplay = document.getElementById('p1ValDisplay')
-                const p2ValDisplay = document.getElementById('p2ValDisplay')
-                const p3Val1Display = document.getElementById('p3Val1Display');
-                const p3Val2Display = document.getElementById('p3Val2Display');
                 const p1Range = document.getElementById('p1Range');
-                const p2Range = document.getElementById('p2Range');
-                const p3Range1 = document.getElementById('p3Range1');
-                const p3Range2 = document.getElementById('p3Range2')
                 const pControls = document.getElementById('pControls');
                 const rgbPicker = document.getElementById('rgbPicker');
                 const manualControls = document.getElementById('manualControls');
@@ -998,8 +961,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                 const submitCredentialsButton = document.getElementById('submitCredentialsButton');
                 const modalFailure = document.getElementById('modalFailure');
                 const manualForm = document.getElementById('manualForm');
-                const drink2Container = document.getElementById('drink2Container');
-                const drink3Container = document.getElementById('drink3Container');
                 var websocket;
 
 
@@ -1021,18 +982,9 @@ const char main_html[] PROGMEM = R"rawliteral(
                     if (message.type == 'pourSize') {
                         console.log('Pour size message received');
                         p1Range.value = message.p1 / 1000;
-                        p2Range.value = message.p2 / 1000;
-                        p3Range1.value = message.mixed1 / 1000;
-                        p3Range2.value = message.mixed2 / 1000;
                         displaySliderVals();
                         p1Range.classList.remove('thumb-blue');
                         p1Range.classList.add('thumb-green');
-                        p2Range.classList.remove('thumb-blue');
-                        p2Range.classList.add('thumb-green');
-                        p3Range1.classList.remove('thumb-blue');
-                        p3Range1.classList.add('thumb-green');
-                        p3Range2.classList.remove('thumb-blue');
-                        p3Range2.classList.add('thumb-green');
                     } else if (message.type == 'ledSettings') {
                         console.log('LED settings message received');
                         red.value = message.red;
@@ -1065,8 +1017,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                 }
                 function handleExpansionType () {
                     const elements = [
-                        drink2Container,
-                        drink3Container,
                         rPump2
                     ];
                     elements.forEach(element => {
@@ -1097,14 +1047,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                 function initButton() {
                     drink1Button.addEventListener('click', function () {
                         sendMessage('pour', { drink: 'drink1', size: p1Range.value });
-                    }, false);
-
-                    drink2Button.addEventListener('click', function () {
-                        sendMessage('pour', { drink: 'drink2', size: p2Range.value });
-                    }, false);
-
-                    drink3Button.addEventListener('click', function () {
-                        sendMessage('pour', { drink: 'drink3', size1: p3Range1.value, size2: p3Range2.value });
                     }, false);
 
                     cancelButton.addEventListener('click', function () {
@@ -1161,21 +1103,20 @@ const char main_html[] PROGMEM = R"rawliteral(
                         sendMessage('manual', { action: 'rPump1Stop' });
                         console.log('touchend event');
                     }, false);
-
                     rPump2.addEventListener('mousedown', function () {
-                        sendMessage('manual', { action: 'rPump2Start' });
+                        sendMessage('manual', { action: 'rToggleDrawer' });
                         console.log('mousedown event');
                     }, false);
                     rPump2.addEventListener('mouseup', function () {
-                        sendMessage('manual', { action: 'rPump2Stop' });
+                        sendMessage('manual', { action: 'rDrawerStop' });
                         console.log('mouseup event');
                     }, false);
                     rPump2.addEventListener('touchstart', function () {
-                        sendMessage('manual', { action: 'rPump2Start' });
+                        sendMessage('manual', { action: 'rToggleDrawer' });
                         console.log('touchstart event');
                     }, false);
                     rPump2.addEventListener('touchend', function () {
-                        sendMessage('manual', { action: 'rPump2Stop' });
+                        sendMessage('manual', { action: 'rDrawerStop' });
                         console.log('touchend event');
                     }, false);
 
@@ -1331,8 +1272,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                                             modeValues:
                                                 [
                                                     "drink1",
-                                                    "drink2",
-                                                    "drink3",
                                                     "cancel"
                                                 ]
                                         },
@@ -1489,50 +1428,10 @@ const char main_html[] PROGMEM = R"rawliteral(
                         
                     }
                
-                function p3ValueSafety(pToAdj, pUserAdj) {
-                    const sum = parseInt(pUserAdj.value) + parseInt(pToAdj.value);
-                    if (sum > 20) {
-                        pToAdj.classList.add('thumb-blue');
-                        pToAdj.classList.remove('thumb-green');
-                        pToAdj.value = 20 - pUserAdj.value;
-                    }
-                }
                 function initSliders() {
 
                     displaySliderVals();
                     setColor();
-                    p3Range1.oninput = function () {
-                        p3Range1.classList.add('thumb-blue');
-                        p3Range1.classList.remove('thumb-green');
-                        p3ValueSafety(p3Range2, p3Range1);
-                        displaySliderVals();
-                    }
-                    p3Range1.ontouchend = function () {
-                        sendMessage('changePourSize', {
-                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
-                        });
-                    }
-                    p3Range1.onmouseup = function () {
-                        sendMessage('changePourSize', {
-                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
-                        });
-                    }
-                    p3Range2.oninput = function () {
-                        p3Range2.classList.add('thumb-blue');
-                        p3Range2.classList.remove('thumb-green');
-                        p3ValueSafety(p3Range1, p3Range2);
-                        displaySliderVals();
-                    }
-                    p3Range2.ontouchend = function () {
-                        sendMessage('changePourSize', {
-                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
-                        });
-                    }
-                    p3Range2.onmouseup = function () {
-                        sendMessage('changePourSize', {
-                            drink: "drink3", size1: p3Range1.value, size2: p3Range2.value
-                        });
-                    }
                     p1Range.oninput = function () {
                         p1Range.classList.add('thumb-blue');
                         p1Range.classList.remove('thumb-green');
@@ -1543,17 +1442,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                     }
                     p1Range.onmouseup = function () {
                         sendMessage('changePourSize', { drink: "drink1", size: p1Range.value });
-                    }
-                    p2Range.oninput = function () {
-                        p2Range.classList.add('thumb-blue');
-                        p2Range.classList.remove('thumb-green');
-                        displaySliderVals();
-                    }
-                    p2Range.ontouchend = function () {
-                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
-                    }
-                    p2Range.onmouseup = function () {
-                        sendMessage('changePourSize', { drink: "drink2", size: p2Range.value });   
                     }
                     brightness.oninput = function () {
                         brightness.classList.add('thumb-blue');
@@ -1606,9 +1494,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                 }
                 function displaySliderVals() {
                     p1ValDisplay.innerHTML = "Pour Size: " + p1Range.value;
-                    p2ValDisplay.innerHTML = "Pour Size: " + p2Range.value;
-                    p3Val1Display.innerHTML = "Pump 1 Amount: " + p3Range1.value;
-                    p3Val2Display.innerHTML = "Pump 2 Amount: " + p3Range2.value;
                     brightValDisplay.innerHTML = "Brightness Level: " + brightness.value;
                     rDisplay.innerHTML = "Red Value: " + red.value;
                     gDisplay.innerHTML = "Green Value: " + green.value;
@@ -1666,14 +1551,6 @@ const char main_html[] PROGMEM = R"rawliteral(
                     if (drink == 'drink1') {
                         drinkNum = "1"
                         drink = drink1Label
-                    }
-                    if (drink == 'drink2') {
-                        drinkNum = "2"
-                        drink = drink2Label
-                    }
-                    if (drink == 'drink3') {
-                        drinkNum = "3"
-                        drink = drink3Label
                     }
                     drink.innerHTML = name;
                     return console.log('Drink ' + drinkNum + ' name changed to: ', name + '.');

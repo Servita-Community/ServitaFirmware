@@ -214,10 +214,8 @@ void handle_motor_json(JsonObject payload) {
         set_motor_state(&pump1, MOTOR_ON);
     } else if (strcmp(action, "rPump1Stop") == 0) {
         set_motor_state(&pump1, MOTOR_OFF);
-    } else if (strcmp(action, "rDrawerOpening") == 0) {
-        set_motor_state(&drawer, DRAWER_OPENING);
-    } else if (strcmp(action, "rDrawerClosing") == 0) {
-        set_motor_state(&drawer, DRAWER_CLOSING);
+    } else if (strcmp(action, "rToggleDrawer") == 0) {
+        toggle_drawer();
     } else if (strcmp(action, "rDrawerStop") == 0) {
         set_motor_state(&drawer, MOTOR_OFF);
     } else if(strcmp(action, "mCarHome") == 0) {
