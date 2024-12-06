@@ -48,7 +48,6 @@ void IRAM_ATTR handle_button2() {
 
 void pour_trigger_check() {
     bool b1_triggerable = (millis() - button1_press_time) > TRIGGER_HOLD_TIME && button1_pressed;
-    bool b2_triggerable = (millis() - button2_press_time) > TRIGGER_HOLD_TIME && button2_pressed;
 
     if (drink_pour.state == IDLE) {
         if (b1_triggerable) {
@@ -57,49 +56,18 @@ void pour_trigger_check() {
             );
             start_pour(DRINK1);
             button1_press_time = millis();
-        } else if (b2_triggerable) {
-            Serial.printf(
-                "Starting pour from button2 time: %d ms\n", millis() - button2_press_time
-            );
-            start_pour(DRINK2);
-            button2_press_time = millis();
-        }
-    } else if (drink_pour.state == GANTRY_DECENDING) {
-        if (b1_triggerable && drink_pour.drink == DRINK2) {
-            Serial.printf(
-                "Switching to mixed drink from button1 time: %d ms\n",
-                millis() - button1_press_time
-            );
-            drink_pour.drink = MIXED;
-            set_board_color(RGB::POUR_DRINK_MIXED_COLOR);
-            button1_press_time = millis();
-        } else if (b2_triggerable && drink_pour.drink == DRINK1) {
-            Serial.printf(
-                "Switching to mixed drink from button2 time: %d ms\n",
-                millis() - button2_press_time
-            );
-            drink_pour.drink = MIXED;
-            set_board_color(RGB::POUR_DRINK_MIXED_COLOR);
-            button2_press_time = millis();
         }
     }
 }
 
 void pour_cancel_check() {
     bool b1_cancelable = (millis() - button1_press_time) > CANCEL_HOLD_TIME && button1_pressed;
-    bool b2_cancelable = (millis() - button2_press_time) > CANCEL_HOLD_TIME && button2_pressed;
-
     bool b1_triggerable = (millis() - button1_press_time) > TRIGGER_HOLD_TIME && button1_pressed;
-    bool b2_triggerable = (millis() - button2_press_time) > TRIGGER_HOLD_TIME && button2_pressed;
 
     if (drink_pour.state == GANTRY_DECENDING) {
         if (b1_cancelable) {
             Serial.printf("Pour cancelled by button1 time: %d ms\n", millis() - button1_press_time);
             button1_pressed = false;
-            abort_pour();
-        } else if (b2_cancelable) {
-            Serial.printf("Pour cancelled by button2 time: %d ms\n", millis() - button2_press_time);
-            button2_pressed = false;
             abort_pour();
         }
     } else if (drink_pour.state == POURING) {
@@ -107,10 +75,30 @@ void pour_cancel_check() {
             Serial.printf("Cancel pour from button1 time: %d ms\n", millis() - button1_press_time);
             button1_pressed = false;
             abort_pour();
-        } else if (b2_triggerable) {
-            Serial.printf("Cancel pour from button2 time: %d ms\n", millis() - button2_press_time);
+        }
+    }
+}
+
+void drawer_trigger_check() {
+    bool b2_triggerable = (millis() - button2_press_time) > TRIGGER_HOLD_TIME && button2_pressed;
+
+    if (drawer.state == MOTOR_OFF) {
+        if (b2_triggerable) {
+            Serial.printf("Toggling drawer from button2 time: %d ms\n", millis() - button2_press_time);
+            toggle_drawer();
+            button2_press_time = millis();
+        }
+    }
+}
+
+void drawer_cancel_check() {
+    bool b2_cancelable = (millis() - button2_press_time) > CANCEL_HOLD_TIME && button2_pressed;
+
+    if (drawer.state != MOTOR_OFF) {
+        if (b2_cancelable) {
+            Serial.printf("Drawer movement cancelled by button2 time: %d ms\n", millis() - button2_press_time);
             button2_pressed = false;
-            abort_pour();
+            set_motor_state(&drawer, MOTOR_OFF);
         }
     }
 }
@@ -118,4 +106,6 @@ void pour_cancel_check() {
 void button_loop() {
     pour_trigger_check();
     pour_cancel_check();
+    drawer_trigger_check();
+    drawer_cancel_check();
 }

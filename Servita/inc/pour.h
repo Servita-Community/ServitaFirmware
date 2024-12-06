@@ -22,15 +22,10 @@ enum pour_states_t {
 
 enum drink_t {
     DRINK1,
-    DRINK2,
-    MIXED,
 };
 
 enum pour_size_setting_t {
     DRINK1_POUR_SIZE,
-    DRINK2_POUR_SIZE,
-    MIXED_POUR_1_SIZE,
-    MIXED_POUR_2_SIZE,
 };
 
 typedef struct {
@@ -41,9 +36,6 @@ typedef struct {
 
 
 extern uint32_t drink1_pour_size;
-extern uint32_t drink2_pour_size;
-extern uint32_t mixed1_pour_size;
-extern uint32_t mixed2_pour_size;
 extern drink_pour_t drink_pour;
 extern bool lockout;
 extern String get_pour_size();

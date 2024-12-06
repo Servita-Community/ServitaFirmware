@@ -16,9 +16,6 @@
 
 
 uint32_t drink1_pour_size;
-uint32_t drink2_pour_size;
-uint32_t mixed1_pour_size;
-uint32_t mixed2_pour_size;
 drink_pour_t drink_pour;
 bool lockout = false;
 
@@ -27,9 +24,6 @@ Preferences pour_preferences;
 void init_pour_system() {
     pour_preferences.begin("pour", false);
     drink1_pour_size = pour_preferences.getUInt("drink1", 0);
-    drink2_pour_size = pour_preferences.getUInt("drink2", 0);
-    mixed1_pour_size = pour_preferences.getUInt("mixed1", 0);
-    mixed2_pour_size = pour_preferences.getUInt("mixed2", 0);
     pour_preferences.end();
 
     drink_pour.drink = DRINK1;
@@ -43,12 +37,6 @@ String get_pour_size() {
     StaticJsonDocument<256> payload;
     payload["type"] = "pourSize";
     payload["p1"] = String(drink1_pour_size);
-
-    if (expansion_type == DUO_BOARD) {
-        payload["p2"] = String(drink2_pour_size);
-        payload["mixed1"] = String(mixed1_pour_size);
-        payload["mixed2"] = String(mixed2_pour_size);
-    }
     String jsonString;
     serializeJson(payload, jsonString);
     return jsonString;
@@ -62,28 +50,13 @@ void set_pour_size(pour_size_setting_t setting, uint32_t pour_size) {
             pour_preferences.putUInt("drink1", drink1_pour_size);
             break;
         }
-        case DRINK2_POUR_SIZE: {
-            drink2_pour_size = pour_size;
-            pour_preferences.putUInt("drink2", drink2_pour_size);
-            break;
-        }
-        case MIXED_POUR_1_SIZE: {
-            mixed1_pour_size = pour_size;
-            pour_preferences.putUInt("mixed1", mixed1_pour_size);
-            break;
-        }
-        case MIXED_POUR_2_SIZE: {
-            mixed2_pour_size = pour_size;
-            pour_preferences.putUInt("mixed2", mixed2_pour_size);
-            break;
-        }
     }
     pour_preferences.end();
 }
 
 void start_pour(drink_t drink) {
-    if (drink != DRINK1 && expansion_type != DUO_BOARD) {
-        Serial.println("Duo Board required for drinks 2 & 3.");
+    if (drink != DRINK1) {
+        Serial.println("Drinks other than drink1 are not supported.");
         return;
     }
 
@@ -99,10 +72,7 @@ void start_pour(drink_t drink) {
 
     drink_pour.drink = drink;
     set_motor_state(&gantry, MOTOR_DOWN);
-    set_board_color(
-        drink == DRINK1 ? RGB::POUR_DRINK_1_COLOR : 
-        drink == DRINK2 ? RGB::POUR_DRINK_2_COLOR : RGB::POUR_DRINK_MIXED_COLOR
-    );
+    set_board_color(RGB::POUR_DRINK_1_COLOR);
     drink_pour.state = GANTRY_DECENDING;
     gantry_state = GANTRY_POURING;
     Serial.printf("Starting pour for drink: %d\n", drink);
@@ -116,14 +86,13 @@ void pour_seq_loop() {
             if (digitalRead(LIMIT_SWITCH_BOTTOM) == LOW) {
                 drink_pour.pour_start_time = (uint64_t) millis();
 
-                if (is_button_pressed(BUTTON1) || is_button_pressed(BUTTON2)) {
+                if (is_button_pressed(BUTTON1)) {
                     Serial.println("Button based pour cancel detected. Aborting pour...");
                     abort_pour();
                     break;
                 }
 
-                if (drink_pour.drink != DRINK2)             set_motor_state(&pump1, MOTOR_ON);
-                if (drink_pour.drink != DRINK1)             set_motor_state(&pump2, MOTOR_ON);
+                if (drink_pour.drink == DRINK1)             set_motor_state(&pump1, MOTOR_ON);
                 drink_pour.state = POURING;
                 Serial.println("Gantry down all done switching to pouring.");
             } else {
@@ -136,27 +105,6 @@ void pour_seq_loop() {
                 case DRINK1:
                     if (pour_time >= drink1_pour_size) {
                         set_motor_state(&pump1, MOTOR_OFF);
-                        set_motor_state(&gantry, MOTOR_UP);
-                        drink_pour.state = GANTRY_ASCENDING;
-                        Serial.println("Pouring complete switching to gantry up.");
-                    }
-                    break;
-                case DRINK2:
-                    if (pour_time >= drink2_pour_size) {
-                        set_motor_state(&pump2, MOTOR_OFF);
-                        set_motor_state(&gantry, MOTOR_UP);
-                        drink_pour.state = GANTRY_ASCENDING;
-                        Serial.println("Pouring complete switching to gantry up.");
-                    }
-                    break;
-                case MIXED:
-                    bool pump1_done = pour_time >= mixed1_pour_size;
-                    bool pump2_done = pour_time >= mixed2_pour_size;
-
-                    if (pump1_done)     set_motor_state(&pump1, MOTOR_OFF);
-                    if (pump2_done)     set_motor_state(&pump2, MOTOR_OFF);
-
-                    if (pump1_done && pump2_done) {
                         set_motor_state(&gantry, MOTOR_UP);
                         drink_pour.state = GANTRY_ASCENDING;
                         Serial.println("Pouring complete switching to gantry up.");
@@ -188,8 +136,6 @@ void abort_pour() {
 
     set_motor_state(&pump1, MOTOR_OFF);
 
-    if (expansion_type == DUO_BOARD)        set_motor_state(&pump2, MOTOR_OFF);
-
     if (!lockout) {
         set_motor_state(&gantry, MOTOR_UP);
         drink_pour.state = GANTRY_ASCENDING;
@@ -218,26 +164,16 @@ void handle_pour_json(JsonObject payload) {
         return;
     }
 
-    uint32_t size1, size2;
+    uint32_t size1;
     bool drink1 = strcmp(drink, "drink1") == 0;
-    bool drink2 = strcmp(drink, "drink2") == 0;
 
-    if (drink1 || drink2) {
+    if (drink1) {
         const char* sizeStr = payload["size"];
         if (!validate_and_convert_size(sizeStr, size1)) return;
 
         Serial.printf("Setting pour size for %s to: %u ms\n", drink, size1);
-        set_pour_size(drink1 ? DRINK1_POUR_SIZE : DRINK2_POUR_SIZE, size1);
-        start_pour(drink1 ? DRINK1 : DRINK2);
-    } else if (strcmp(drink, "drink3") == 0) {
-        const char* size1Str = payload["size1"];
-        const char* size2Str = payload["size2"];
-        if (!validate_and_convert_size(size1Str, size1) || !validate_and_convert_size(size2Str, size2)) return;
-
-        Serial.printf("Setting pour sizes for mixed drink to: %u ms and %u ms\n", size1, size2);
-        set_pour_size(MIXED_POUR_1_SIZE, size1);
-        set_pour_size(MIXED_POUR_2_SIZE, size2);
-        start_pour(MIXED);
+        set_pour_size(DRINK1_POUR_SIZE, size1);
+        start_pour(DRINK1);
     } else if (strcmp(drink, "pourCancel") == 0) {
         Serial.println("Aborting pour.");
         abort_pour();

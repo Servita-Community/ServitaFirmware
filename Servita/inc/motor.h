@@ -12,12 +12,13 @@
 #include <ArduinoJson.h>
 
 #define GANTRY_TIMEOUT 15000
+#define DRAWER_TIMEOUT 15000
 #define MOTOR_BACKOFF_TIME 200
 #define LIMIT_SWITCH_DEBOUNCE 20
 
 #define MOTOR_TYPE_TO_STRING(type) \
     (type == PUMP1) ? "PUMP1" : \
-    (type == PUMP2) ? "PUMP2" : \
+    (type == DRAWER) ? "DRAWER" : \
     (type == GANTRY) ? "GANTRY" : "UNKNOWN"
 
 #define MOTOR_STATE_TO_STRING(state) \
@@ -26,17 +27,20 @@
     (state == MOTOR_UP) ? "MOTOR_UP" : \
     (state == MOTOR_DOWN) ? "MOTOR_DOWN" : "UNKNOWN"
 
+
 enum motor_state_t {
     MOTOR_OFF,
     MOTOR_ON,
     MOTOR_UP,
-    MOTOR_DOWN
+    MOTOR_DOWN,
+    DRAWER_OPENING,
+    DRAWER_CLOSING
 };
 
 enum motor_type_t {
     PUMP1,
-    PUMP2,
     GANTRY,
+    DRAWER
 };
 
 enum gantry_state_t {
@@ -56,7 +60,7 @@ typedef struct {
 } motor_t;
 
 extern motor_t pump1;
-extern motor_t pump2;
+extern motor_t drawer;
 extern motor_t gantry;
 extern gantry_state_t gantry_state;
 
@@ -73,6 +77,12 @@ void init_limit_switches();
  * @return void
  */
 void init_motor(motor_t *motor);
+
+/**
+ * @brief Toggle Drawer
+ * 
+ */
+void toggle_drawer();
 
 /**
  * @brief 

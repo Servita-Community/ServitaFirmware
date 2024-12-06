@@ -49,8 +49,6 @@ bool on_set_mode(const String& deviceId, const String& instance, String &mode) {
 
     if (instance == "serve-drink") {
         if (mode == "drink1")           start_pour(DRINK1);
-        else if (mode == "drink2")      start_pour(DRINK2);
-        else if (mode == "drink3")      start_pour(MIXED);
         else if (mode == "cancel")      abort_pour();
         else {
             Serial.printf("[Device: %s]: Invalid mode: %s\r\n", deviceId.c_str(), mode.c_str());

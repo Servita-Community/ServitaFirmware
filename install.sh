@@ -37,6 +37,8 @@ echo "Installing required libraries..."
 arduino-cli lib install "FastLED@3.7.0"
 arduino-cli lib install "AsyncTCP@1.1.4"
 arduino-cli lib install "ArduinoJson@7.0.4"
+arduino-cli lib install "ESP Async WebServer@3.0.6"
+arduino-cli lib install "WebSockets@2.5.1"
 
 # Check if ESPAsyncWebServer is already installed
 ESPASYNC_WEBSERVER_DIR="$HOME/Arduino/libraries/ESPAsyncWebServer"
