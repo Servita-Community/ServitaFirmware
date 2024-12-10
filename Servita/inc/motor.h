@@ -12,7 +12,6 @@
 #include <ArduinoJson.h>
 
 #define GANTRY_TIMEOUT 15000
-#define DRAWER_TIMEOUT 15000
 #define MOTOR_BACKOFF_TIME 200
 #define LIMIT_SWITCH_DEBOUNCE 20
 
@@ -27,6 +26,11 @@
     (state == MOTOR_UP) ? "MOTOR_UP" : \
     (state == MOTOR_DOWN) ? "MOTOR_DOWN" : "UNKNOWN"
 
+
+extern uint16_t drawer_timeout_ms;
+extern uint16_t min_distance;
+extern uint16_t max_distance;
+extern float mid_distance;
 
 enum motor_state_t {
     MOTOR_OFF,

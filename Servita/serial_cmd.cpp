@@ -30,6 +30,35 @@ serial_command_t serial_commands[] = {
     {"getExpansionType", [](String params){get_expansion_version(); }},
     {"saveExpansionType", handle_save_expansion_type},
     {"setBoardLed", handle_set_board_led},
+    {"setMinTofDistance", [](String params){ 
+        // Check if the new min distance is less than the max distance and is an integer
+        if (params.toInt() > 0) {
+            min_distance = params.toInt();
+            mid_distance = (min_distance + max_distance) / 2;
+        } else {
+            Serial.println("Invalid min distance.");
+        }
+    }},
+    {"setMaxTofDistance", [](String params){
+        // Check if the new max distance is greater than the min distance and is an integer
+        if (params.toInt() > 0) {
+            max_distance = params.toInt();
+            mid_distance = (min_distance + max_distance) / 2;
+        } else {
+            Serial.println("Invalid max distance.");
+        }
+    }},
+    {"setTofTimeoutMs", [](String params){
+        // Check if the new timeout is greater than 0 and is an integer
+        if (params.toInt() > 0) {
+            drawer_timeout_ms = params.toInt();
+        } else {
+            Serial.println("Invalid timeout.");
+        }
+    }},
+    {"getMinTofDistance", [](String params){ Serial.printf("Min TOF Distance: %d\n", min_distance);}},
+    {"getMaxTofDistance", [](String params){ Serial.printf("Max TOF Distance: %d\n", max_distance);}},
+    {"getTofTimeoutMs", [](String params){ Serial.printf("TOF Timeout ms: %d\n", drawer_timeout_ms);}},
     {"version", [](String params){ Serial.printf("Software version: %s\n", SOFTWARE_VERSION); }}
 };
 

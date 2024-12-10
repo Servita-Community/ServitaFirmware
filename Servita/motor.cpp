@@ -20,9 +20,10 @@ uint32_t last_motor_start_time = 0;
 uint32_t last_drawer_start_time = 0;
 
 VL53L1X sensor;
-const uint16_t min_distance = 40;
-const uint16_t max_distance = 373;
-const float mid_distance = (min_distance + max_distance) / 2;
+uint16_t drawer_timeout_ms = 65000;
+uint16_t min_distance = 40;
+uint16_t max_distance = 373;
+float mid_distance = (min_distance + max_distance) / 2;
 
 bool init_sensor() {
     sensor.setTimeout(500);
@@ -283,7 +284,7 @@ void motor_loop() {
             break;
     }
 
-    if (drawer.state != MOTOR_OFF && (millis() - last_drawer_start_time) > DRAWER_TIMEOUT) {
+    if (drawer.state != MOTOR_OFF && (millis() - last_drawer_start_time) > drawer_timeout_ms) {
         set_motor_state(&drawer, drawer.state == DRAWER_OPENING ? DRAWER_CLOSING : DRAWER_OPENING);
         delay(MOTOR_BACKOFF_TIME);
         set_motor_state(&drawer, MOTOR_OFF);
