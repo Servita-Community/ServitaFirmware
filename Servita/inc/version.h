@@ -10,7 +10,7 @@
 
 #include <Arduino.h>
 
-#define SOFTWARE_VERSION "vDrawer1.2"
+#define SOFTWARE_VERSION "vDrawer1.3"
 
 extern String board_version;
 

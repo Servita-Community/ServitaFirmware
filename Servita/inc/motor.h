@@ -10,6 +10,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <Preferences.h>
 
 #define GANTRY_TIMEOUT 15000
 #define MOTOR_BACKOFF_TIME 200
@@ -31,6 +32,8 @@ extern uint16_t drawer_timeout_ms;
 extern uint16_t min_distance;
 extern uint16_t max_distance;
 extern float mid_distance;
+
+extern Preferences drawer_preferences;
 
 enum motor_state_t {
     MOTOR_OFF,

@@ -5,6 +5,7 @@
  * @date 2024-05-28
  */
 #include <ArduinoJson.h>
+#include <Preferences.h>
 #include <VL53L1X.h>
 #include "inc/motor.h"
 #include "inc/led.h"
@@ -20,12 +21,21 @@ uint32_t last_motor_start_time = 0;
 uint32_t last_drawer_start_time = 0;
 
 VL53L1X sensor;
+Preferences drawer_preferences;
 uint16_t drawer_timeout_ms = 65000;
 uint16_t min_distance = 40;
 uint16_t max_distance = 373;
 float mid_distance = (min_distance + max_distance) / 2;
 
 bool init_sensor() {
+
+    drawer_preferences.begin("drawer", false);
+    drawer_timeout_ms = drawer_preferences.getUInt("timeout", 65000);
+    min_distance = drawer_preferences.getUInt("mindist", 40);
+    max_distance = drawer_preferences.getUInt("maxdist", 373);
+    mid_distance = (min_distance + max_distance) / 2;
+    drawer_preferences.end();
+
     sensor.setTimeout(500);
     if (!sensor.init()) {
         Serial.println("Failed to detect and initialize TOF sensor!");

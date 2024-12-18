@@ -35,6 +35,9 @@ serial_command_t serial_commands[] = {
         if (params.toInt() > 0) {
             min_distance = params.toInt();
             mid_distance = (min_distance + max_distance) / 2;
+            drawer_preferences.begin("drawer", false);
+            drawer_preferences.putUInt("mindist", min_distance);
+            drawer_preferences.end();
         } else {
             Serial.println("Invalid min distance.");
         }
@@ -44,6 +47,9 @@ serial_command_t serial_commands[] = {
         if (params.toInt() > 0) {
             max_distance = params.toInt();
             mid_distance = (min_distance + max_distance) / 2;
+            drawer_preferences.begin("drawer", false);
+            drawer_preferences.putUInt("maxdist", max_distance);
+            drawer_preferences.end();
         } else {
             Serial.println("Invalid max distance.");
         }
@@ -52,6 +58,9 @@ serial_command_t serial_commands[] = {
         // Check if the new timeout is greater than 0 and is an integer
         if (params.toInt() > 0) {
             drawer_timeout_ms = params.toInt();
+            drawer_preferences.begin("drawer", false);
+            drawer_preferences.putUInt("timeout", drawer_timeout_ms);
+            drawer_preferences.end();
         } else {
             Serial.println("Invalid timeout.");
         }
