@@ -8,6 +8,8 @@ uint8_t board_brightness;
 RGB strip_color;
 uint8_t strip_brightness;
 uint8_t strip_length;
+bool array_fried = false;
+String led_array_checker;
 
 Preferences led_preferences;
 
@@ -19,12 +21,32 @@ void init_leds() {
     strip_color.b = led_preferences.getUInt("blue", 0);
     strip_length = led_preferences.getUInt("length", DEFAULT_STRIP_LENGTH);
     strip_brightness = led_preferences.getUInt("stripbrightness", DEFAULT_STRIP_BRIGHTNESS);
+    led_array_checker = led_preferences.getString("ledcheck", "");
+    led_preferences.end();
+
+
+    if (led_array_checker == "preledcheck") {
+        array_fried = true;
+        Serial.println("Array LED data pin is fried, disabling array LEDs");
+    } else {
+        led_preferences.begin("led", false);
+        led_preferences.putString("ledcheck", "preledcheck");
+        led_preferences.end();
+    }
+
 
     rmtInit(BOARD_LED_DATA_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_1, 10000000);
-    rmtInit(ARRAY_LED_DATA_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_2, 10000000);
+    if (!array_fried) {
+        rmtInit(ARRAY_LED_DATA_PIN, RMT_TX_MODE, RMT_MEM_NUM_BLOCKS_2, 10000000);
+    }
 
     set_led_color(BOARD_LED_DATA_PIN, RGB::INITIAL_BOOT_COLOR, board_brightness, 1);
-    set_led_color(ARRAY_LED_DATA_PIN, strip_color, strip_brightness, strip_length);
+    if (!array_fried) {
+        set_led_color(ARRAY_LED_DATA_PIN, strip_color, strip_brightness, strip_length);
+        led_preferences.begin("led", false);
+        led_preferences.putString("ledcheck", "ledsaregood");
+        led_preferences.end();
+    }
 
     Serial.println("LEDs initialized.");
 }
@@ -68,6 +90,10 @@ void set_board_brightness(uint8_t brightness) {
 }
 
 void set_strip_color(RGB color) {
+    if (array_fried) {
+        Serial.println("Array LED data pin is fried, cannot set strip color");
+        return;
+    }
     strip_color = color;
     set_led_color(ARRAY_LED_DATA_PIN, color, strip_brightness, strip_length);
 

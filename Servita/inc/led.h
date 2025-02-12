@@ -73,6 +73,8 @@ extern uint8_t board_brightness;
 extern RGB strip_color;
 extern uint8_t strip_brightness;
 extern uint8_t strip_length;
+extern bool array_fried;
+extern String led_array_checker;
 
 void init_leds();
 void set_led_color(uint8_t pin, RGB color, uint8_t brightness, uint8_t num_leds);
