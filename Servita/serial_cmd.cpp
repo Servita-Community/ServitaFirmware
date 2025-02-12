@@ -38,12 +38,7 @@ serial_command_t serial_commands[] = {
     {"saveExpansionType", handle_save_expansion_type},
     {"setBoardLed", handle_set_board_led},
     {"version", [](String params){ Serial.printf("Software version: %s\n", SOFTWARE_VERSION); }},
-    {"unfryLedArray" [](String parms){
-        led_preferences.begin("led", false);
-        led_preferences.putString("ledcheck", "");
-        led_preferences.end();
-        ESP.restart();
-    }
+    {"unfryLedArray", [](String parms){ unfry_led_array(); }}
 };
 
 // Number of commands

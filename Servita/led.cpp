@@ -51,6 +51,13 @@ void init_leds() {
     Serial.println("LEDs initialized.");
 }
 
+void unfry_led_array() {
+    led_preferences.begin("led", false);
+    led_preferences.putString("ledcheck", "");
+    led_preferences.end();
+    ESP.restart();
+}
+
 void set_led_color(uint8_t pin, RGB color, uint8_t brightness, uint8_t num_leds) {
     uint16_t num_of_bits = num_leds * 24;
     rmt_data_t led_data[num_of_bits];

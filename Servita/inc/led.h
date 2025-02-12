@@ -77,6 +77,7 @@ extern bool array_fried;
 extern String led_array_checker;
 
 void init_leds();
+void unfry_led_array();
 void set_led_color(uint8_t pin, RGB color, uint8_t brightness, uint8_t num_leds);
 void set_board_color(RGB color);
 void set_board_brightness(uint8_t brightness);
