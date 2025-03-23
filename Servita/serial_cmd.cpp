@@ -32,6 +32,7 @@ serial_command_t serial_commands[] = {
     {"cancel", [](String params){ abort_pour(); }},
     {"restart", [](String params){ ESP.restart(); }},
     {"deleteCredentials", [](String params){ delete_credentials(); }},
+    {"saveCredentials", handle_save_credentials},
     {"getBrdVersion", [](String params){ get_board_version(); }},
     {"saveBrdVersion", handle_save_brd_version},
     {"getExpansionType", [](String params){get_expansion_version(); }},

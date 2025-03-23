@@ -13,6 +13,7 @@
 #include "inc/led.h"
 #include "inc/expansion.h"
 #include "inc/sinric.h"
+#include "inc/version.h"
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
@@ -25,6 +26,15 @@ AsyncWebSocket ws("/ws");
 Preferences wifi_preferences;
 DNSServer local_dns;
 bool hosted_locally = true;
+
+void handle_save_credentials(String params) {
+    int firstSpaceIndex = params.indexOf(' ');
+    String ssid = params.substring(0, firstSpaceIndex);
+    String pass = params.substring(firstSpaceIndex + 1);
+    save_credentials(ssid.c_str(), pass.c_str());
+
+    ESP.restart();
+}
 
 void save_credentials(const char *ssid, const char *pass) {
     wifi_preferences.begin("wifi", false);
@@ -52,6 +62,19 @@ void get_credentials(String *ssid, String *pass) {
         return;
     }
     Serial.printf("Retrieved WiFi credentials for ssid: %s\n", ssid->c_str());
+}
+
+String get_status() {
+    DynamicJsonDocument doc(1024);
+
+    doc["ssid"] = WiFi.SSID();
+    doc["ip"] = WiFi.localIP().toString();
+    doc["mac"] = WiFi.macAddress();
+    doc["version"] = SOFTWARE_VERSION;
+
+    String output;
+    serializeJson(doc, output);
+    return output;
 }
 
 bool connect_to_wifi(const char *ssid, const char *pass) {
@@ -207,6 +230,11 @@ void init_server() {
             request->send_P(200, "text/html", main_mini_html);
         });
     }
+
+    server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(200, "application/json", get_status());
+    });
+
     ws.onEvent(on_ws_event);
     server.addHandler(&ws);
     server.begin();

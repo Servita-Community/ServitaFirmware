@@ -14,6 +14,7 @@
 
 extern bool hosted_locally;
 
+void handle_save_credentials(String params);
 void save_credentials(const char *ssid, const char *pass);
 void delete_credentials();
 void get_credentials(String *ssid, String *pass);
